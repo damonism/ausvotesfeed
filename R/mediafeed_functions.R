@@ -287,12 +287,79 @@ get_mediafeed_votes_div <- function(df, xml) {
 }
 
 
+#' Get Media Feed Division IDs
+#'
+#' List division IDs from media feed file.
+#'
+#' @param xml A pointer to an XML media feed object.
+#'
+#' @return A vector of division IDs.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' get_mediafeed_divisionids(xml)
+#' }
 get_mediafeed_divisionids <- function(xml) {
 
   xml_attr(xml_find_all(xml, "//d1:House/d1:Contests/*/eml:ContestIdentifier"), "Id")
 
 }
 
+get_mediafeed_division_details <- function(DivisionID, xml) {
+  # TODO: Document Me!
+
+  tmp_nodes <- xml_parent(xml_find_first(xml, paste0("//eml:ContestIdentifier[@Id=\"", DivisionID, "\"]")))
+  div_name <- xml_text(xml_find_first(tmp_nodes, "d1:PollingDistrictIdentifier/d1:Name"))
+  div_enrolment <- xml_attrs(xml_find_first(tmp_nodes, "d1:Enrolment"))
+  if(length(div_enrolment) != 2) {stop("d1:Enrolment returned the wrong number of items")}
+  names(div_enrolment) <- paste("Enrolment.", names(div_enrolment), sep = "")
+  div_enrolment <- c(div_enrolment,
+                     "Enrolment" = xml_text(xml_find_first(tmp_nodes, "d1:Enrolment")))
+  div_fp <- xml_attrs(xml_find_first(tmp_nodes, "d1:FirstPreferences"))
+  names(div_fp) <- paste("FP.", names(div_fp), sep = "")
+  div_tcp <- xml_attrs(xml_find_first(tmp_nodes, "d1:TwoCandidatePreferred"))
+  div_tcp["Maverick"] <- ifelse(is.na(div_tcp["Maverick"]), "false", div_tcp["Maverick"])
+  names(div_tcp) <- paste("TCP.", names(div_tcp), sep = "")
+
+  div_df <- data.frame(DivisionID = as.integer(DivisionID),
+                       DivisionNm = div_name,
+                       t(data.frame(div_enrolment)),
+                       t(data.frame(div_fp)),
+                       t(data.frame(div_tcp)),
+                       stringsAsFactors = FALSE)
+
+  rownames(div_df) <- NULL
+  return(div_df)
+
+}
+
+#' Get Media Feed Votes by Polling Place for Division
+#'
+#' Extract the votes by candidate and polling place for a division
+#' from the media feed.
+#'
+#' Note: The different vote types are \code{Candidate} (normal candidate votes),
+#' \code{Ghost} (Candidates from previous elections not running in this
+#' election, included for swing purpose), \code{Formal} (total formal votes),
+#' \code{Informal}, \code{TotalVotes} and \code{TCP Votes} (two candidate
+#' preferred votes).
+#'
+#' @param DivisionID A division ID in either character or interger format.
+#' @param xml A pointer to an XML media feed object.
+#'
+#' @return a \code{data.frame} with seven columns: \code{DivisionID},
+#'   \code{PollingPlaceID}, \code{CandidateID}, \code{CandidateType},
+#'   \code{Which} and \code{EventIdentifier}.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library(purrr)
+#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' map_dfr(get_mediafeed_divisionids(tmp_2), get_mediafeed_votes_pps, tmp_2)
+#' }
 get_mediafeed_votes_pps <- function(DivisionID, xml) {
 
   tmp_eventid <- xml_attr(xml_find_first(xml, "//eml:EventIdentifier"), "Id")
