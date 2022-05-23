@@ -33,4 +33,5 @@ file <- download_mediafeed_file(2022, "Preload", "Detailed")
 xml <- read_mediafeed_xml(file, "candidates")
 get_mediafeed_gender(xml, chamber = "senate")
 }
+
 }

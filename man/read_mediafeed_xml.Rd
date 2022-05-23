@@ -21,7 +21,7 @@ Read the media feed XML file and return an \code{xml2} pointer, unzipping the fi
 \details{
 This is either a very thin wrapper around \code{xml2::read_xml()} or an easy
 way to access a media feed XML file that is contained in a zip file, such as
-one downloaded by \link{get_mediafeed_file}.
+one downloaded by \code{\link{download_mediafeed_file}}.
 }
 \examples{
 \dontrun{
@@ -34,6 +34,6 @@ read_mediafeed_xml(download_mediafeed_file(2022, "Preload", "Detailed", "/tmp"))
 
 }
 \seealso{
-\link{get_mediafeed_file} for downloading the correct file from the
-  AEC's FTP site.
+\code{\link{download_mediafeed_file}} for downloading the correct
+  file from the AEC's FTP site.
 }

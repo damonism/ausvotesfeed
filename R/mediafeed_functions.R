@@ -20,6 +20,7 @@
 #' @seealso \link{read_mediafeed_xml} for reading the resulting file.
 #'
 #' @importFrom curl curl curl_download
+#' @importFrom utils tail
 download_mediafeed_file <- function(EventIdentifier, Filetype, Detail = "Detailed", Dest = tempdir(), Archive = TRUE) {
 
   event_id <- vtr_identifier(EventIdentifier, as = "event")
@@ -55,7 +56,7 @@ download_mediafeed_file <- function(EventIdentifier, Filetype, Detail = "Detaile
 #'
 #' This is either a very thin wrapper around \code{xml2::read_xml()} or an easy
 #' way to access a media feed XML file that is contained in a zip file, such as
-#' one downloaded by \link{get_mediafeed_file}.
+#' one downloaded by \code{\link{download_mediafeed_file}}.
 #'
 #' @param path Full path to zip file or XML file
 #' @param filename In the case of the preload zip file, one of \code{results},
@@ -133,7 +134,8 @@ read_mediafeed_xml <- function(path, filename = NA) {
 #' xml <- read_mediafeed_xml(file, "candidates")
 #' get_mediafeed_gender(xml, chamber = "senate")
 #' }
-#' @importFrom xml2 read_xml xml_attr xml_find_all xml_find_first
+#'
+#' @importFrom xml2 read_xml xml_attr xml_find_all xml_find_first xml_text xml_name
 get_mediafeed_gender <- function(xml, chamber) {
 
   if(toupper(chamber) == "HOUSE") {

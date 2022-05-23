@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: person("Damon", "Muller", email = "admin@ausvotes.org",
                   role = c("aut", "cre"))
 Description: Download election results from the Australina Electoral Commission's Virtual Tally Room and media feed xml files.
-License: What license is it under?
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Depends: xml2,
