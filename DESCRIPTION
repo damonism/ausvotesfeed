@@ -11,5 +11,6 @@ LazyData: true
 Depends: xml2,
     curl,
     rappdirs
-Suggests: ausvotes
+Suggests: ausvotes,
+    plumber
 RoxygenNote: 7.2.0

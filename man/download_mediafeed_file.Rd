@@ -9,7 +9,8 @@ download_mediafeed_file(
   Filetype,
   Detail = "Detailed",
   Dest = tempdir(),
-  Archive = TRUE
+  Archive = TRUE,
+  Download = TRUE
 )
 }
 \arguments{
@@ -25,9 +26,13 @@ does not exist) and defaults to \code{tempdir()}}
 
 \item{Archive}{If \code{TRUE} (default), use the AEC's media feed archive
 site, or \code{FALSE} for the live election results}
+
+\item{Download}{(\code{LOGICAL}) If \code{TRUE} (default) download the file
+and return the path on the local disk. If \code{FALSE}, don't download the
+file but return the URL where it located.}
 }
 \value{
-A file path of the downloaded file
+A file path of the downloaded file or the URL of the file
 }
 \description{
 Downloads a specific files from the AEC's media feed FTP site and returns the
