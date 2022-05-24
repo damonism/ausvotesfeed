@@ -91,7 +91,7 @@ download_mediafeed_file <- function(EventIdentifier, Filetype, Detail = "Detaile
 #'   file from the AEC's FTP site.
 #'
 #' @importFrom xml2 read_xml
-#' @importFrom utils unzip
+#' @importFrom utils unzip tail
 read_mediafeed_xml <- function(path, filename = NA) {
 
   filenames <- c("results", "pollingdistricts", "event", "candidates")
@@ -102,22 +102,40 @@ read_mediafeed_xml <- function(path, filename = NA) {
   }
 
   filetype <- rev(strsplit(path, ".", fixed = TRUE)[[1]])[1]
-  # message(filetype)
+  message("File type is: ", filetype)
 
   vtr_id <- grep("^[0-9]{5}$", strsplit(rev(strsplit(path, "/", fixed = TRUE)[[1]])[1], "-", fixed = TRUE)[[1]], value = TRUE)
+  tmp_filename <- tail(strsplit(path, "/")[[1]], 1)
+  tmp_is_preload <- ifelse(grepl("Preload", tmp_filename, fixed = TRUE), TRUE, FALSE)
 
   if(filetype == "xml") {
     return(xml2::read_xml(path))
   }
 
   if(filetype == "zip") {
-    unzip(path, overwrite = TRUE, junkpaths = TRUE, exdir = tempdir())
-    if(!is.na(filename)) {
-      tmp_xml_file <- list.files(tempdir(), pattern = paste0(filename, ".*\\.xml"), full.names = TRUE)
-    } else {
-      tmp_xml_file <- list.files(tempdir(), pattern = paste0("aec-mediafeed-results-.*", vtr_id, "\\.xml"), full.names = TRUE)
+
+    if(tmp_is_preload) {
+      if(is.na(filename)) {
+        stop(tmp_filename, " appears to be a preload zip file; filename argument is required.")
+      }
     }
-    # message(tmp_xml_file)
+
+    tmp_unzipdir <- tempdir()
+
+    # Remove any old XML files
+    tmp_old_files <- list.files(tmp_unzipdir, pattern = ".*\\.xml", full.names = TRUE)
+    message("Found ", length(tmp_old_files), " old XML files. Deleting... " , appendLF = FALSE)
+    unlink(tmp_old_files)
+    message("done.")
+
+    unzip(path, overwrite = TRUE, junkpaths = TRUE, exdir = tmp_unzipdir)
+    message("Unzipping to ", tmp_unzipdir)
+    if(!is.na(filename)) {
+      tmp_xml_file <- list.files(tmp_unzipdir, pattern = paste0(filename, ".*\\.xml"), full.names = TRUE)
+    } else {
+      tmp_xml_file <- list.files(tmp_unzipdir, pattern = paste0("aec-mediafeed-results-.*", vtr_id, "\\.xml"), full.names = TRUE)
+    }
+    message("Reading XML file: ", tmp_xml_file)
     return(xml2::read_xml(tmp_xml_file))
   }
 }
