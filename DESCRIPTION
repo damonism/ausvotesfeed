@@ -9,6 +9,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Depends: xml2,
-    curl
+    curl,
+    rappdirs
 Suggests: ausvotes
 RoxygenNote: 7.2.0
