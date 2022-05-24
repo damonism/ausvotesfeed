@@ -1,113 +1,8 @@
-#' Download file from AEC media feed FTP site
+#' Extract election data from media feed files
 #'
-#' Downloads a specific files from the AEC's media feed FTP site
-#' and returns the filename and path of the file.
+#' @name mediafeed_functions
 #'
-#' @param EventIdentifier AEC event identifier or election year
-#' @param Filetype One of \code{Light}, \code{Preload}, \code{PollingDistricts} or \code{Verbose}
-#' @param Detail One of either \code{Detailed} (default) or \code{Standard}
-#' @param Dest Destination path for the downloaded file (will be created if it does not exist) and defaults to \code{tempdir()}
-#' @param Archive If \code{TRUE} (default), use the AEC's media feed archive site, or \code{FALSE} for the live election results
-#'
-#' @return A file path of the downloaded file
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' download_mediafeed_file(2022, "Preload", "Detailed", "/tmp")
-#' }
-#'
-#' @seealso \link{read_mediafeed_xml} for reading the resulting file.
-#'
-#' @importFrom curl curl curl_download
-#' @importFrom utils tail
-download_mediafeed_file <- function(EventIdentifier, Filetype, Detail = "Detailed", Dest = tempdir(), Archive = TRUE) {
-
-  event_id <- vtr_identifier(EventIdentifier, as = "event")
-
-  if(!Filetype %in% c("Light", "Preload", "PollingDistricts", "Verbose")) {
-    stop(Filetype, " is not a valid Filetype")
-  }
-
-  if(!Detail %in% c("Detailed", "Standard")) {
-    stop(Filetype, " is not a valid Filetype")
-  }
-
-  host <- ifelse(Archive, "mediafeedarchive", "mediafeed")
-
-  path <- paste0("ftp://", host, ".aec.gov.au/",
-                 event_id, "/", Detail, "/", Filetype, "/")
-
-  dir <- readLines(curl(path, "r"))
-  filename <- rev(strsplit(tail(dir, 1), " +")[[1]])[1]
-
-  if(!dir.exists(Dest)) {
-    dir.create(Dest)
-  }
-
-  curl_download(paste0(path, filename), paste0(Dest, "/", filename), quiet = FALSE, mode = "wb")
-
-  return(paste0(Dest, "/", filename))
-}
-
-#' Read AEC media feed XML file
-#'
-#' Read the media feed XML file and return an \code{xml2} pointer, unzipping the file if necessary.
-#'
-#' This is either a very thin wrapper around \code{xml2::read_xml()} or an easy
-#' way to access a media feed XML file that is contained in a zip file, such as
-#' one downloaded by \code{\link{download_mediafeed_file}}.
-#'
-#' @param path Full path to zip file or XML file
-#' @param filename In the case of the preload zip file, one of \code{results},
-#'   \code{pollingdistricts}, \code{event} or \code{candidates}
-#'
-#' @return An \code{XML2} library XML pointer
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Read a file that you have downloaded yourself
-#' read_mediafeed_xml("/tmp/aec-mediafeed-Detailed-Preload-27966-20220503123540.zip", "results")
-#'
-#' # Read a file that has been downloaded with read_mediafeed_xml()
-#' read_mediafeed_xml(download_mediafeed_file(2022, "Preload", "Detailed", "/tmp"))
-#' }
-#'
-#' @seealso \code{\link{download_mediafeed_file}} for downloading the correct
-#'   file from the AEC's FTP site.
-#'
-#' @importFrom xml2 read_xml
-#' @importFrom utils unzip
-read_mediafeed_xml <- function(path, filename = NA) {
-
-  filenames <- c("results", "pollingdistricts", "event", "candidates")
-  if(!is.na(filename)) {
-    if(!filename %in% filenames) {
-      stop(filename, " is not a valid filename.")
-    }
-  }
-
-  filetype <- rev(strsplit(path, ".", fixed = TRUE)[[1]])[1]
-  # message(filetype)
-
-  vtr_id <- grep("^[0-9]{5}$", strsplit(rev(strsplit(path, "/", fixed = TRUE)[[1]])[1], "-", fixed = TRUE)[[1]], value = TRUE)
-
-  if(filetype == "xml") {
-    return(xml2::read_xml(path))
-  }
-
-  if(filetype == "zip") {
-    unzip(path, overwrite = TRUE, junkpaths = TRUE, exdir = tempdir())
-    if(!is.na(filename)) {
-      tmp_xml_file <- list.files(tempdir(), pattern = paste0(filename, ".*\\.xml"), full.names = TRUE)
-    } else {
-      tmp_xml_file <- list.files(tempdir(), pattern = paste0("aec-mediafeed-results-.*", vtr_id, "\\.xml"), full.names = TRUE)
-    }
-    # message(tmp_xml_file)
-    return(xml2::read_xml(tmp_xml_file))
-  }
-}
+NULL
 
 #' Get Media Feed Gender
 #'
@@ -156,137 +51,6 @@ get_mediafeed_gender <- function(xml, chamber) {
 
 }
 
-get_mediafeed_candidates <- function(DivisionID, xml) {
-
-  tmp_candidates <- data.frame()
-
-  tmp_cands <- xml_attr(xml_find_all(xml, paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                                                       DivisionID
-                                                       ,"]/../d1:FirstPreferences/d1:Candidate/eml:CandidateIdentifier")), "Id")
-  tmp_ghosts <- xml_attr(xml_find_all(xml, paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                                                        DivisionID,
-                                                        "]/../d1:FirstPreferences/d1:Ghost/eml:CandidateIdentifier")), "Id")
-
-  tmp_tcp <- xml_attr(xml_find_all(xml, paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                                                     DivisionID,
-                                                     "]/../d1:TwoCandidatePreferred/d1:Candidate/eml:CandidateIdentifier")), "Id")
-
-
-  if(length(tmp_cands) > 0) {
-
-    tmp_candidates <- rbind(tmp_candidates,
-                            data.frame(DivisionID = DivisionID,
-                                       CandidateID = tmp_cands,
-                                       Type = "Candidate",
-                                       stringsAsFactors = FALSE))
-
-  }
-
-  if(length(tmp_ghosts) > 0) {
-
-    tmp_candidates <- rbind(tmp_candidates,
-                            data.frame(DivisionID = DivisionID,
-                                       CandidateID = tmp_ghosts,
-                                       Type = "Ghost",
-                                       stringsAsFactors = FALSE))
-
-  }
-
-  if(length(tmp_tcp) > 0) {
-
-    tmp_candidates <- rbind(tmp_candidates,
-                            data.frame(DivisionID = DivisionID,
-                                       CandidateID = tmp_tcp,
-                                       Type = "TCP",
-                                       stringsAsFactors = FALSE))
-
-  }
-
-  tmp_candidates <- rbind(tmp_candidates,
-                          data.frame(DivisionID = DivisionID,
-                                     CandidateID = c(1, 2),
-                                     Type = "TPP",
-                                     stringsAsFactors = FALSE),
-                          data.frame(DivisionID = DivisionID,
-                                     CandidateID = NA,
-                                     Type = c("Formal", "Informal", "Total"),
-                                     stringsAsFactors = FALSE))
-  return(tmp_candidates)
-
-}
-
-get_mediafeed_votes_div <- function(df, xml) {
-
-  tmp_div <- df[1]
-  tmp_cand <- df[2]
-  tmp_type <- df[3]
-
-  if(tmp_type %in% c("Candidate", "Ghost")) {
-
-    tmp_root <- paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                       tmp_div,
-                       "]/../d1:FirstPreferences/*/eml:CandidateIdentifier[@Id=",
-                       tmp_cand,
-                       "]/../")
-
-  } else if(tmp_type == "TCP") {
-
-    tmp_root <- paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                       tmp_div,
-                       "]/../d1:TwoCandidatePreferred/*/eml:CandidateIdentifier[@Id=",
-                       tmp_cand,
-                       "]/../")
-
-  } else if(tmp_type == "TPP") {
-
-    tmp_root <- paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                       tmp_div,
-                       "]/../d1:TwoPartyPreferred/d1:Coalition/d1:CoalitionIdentifier[@Id=",
-                       tmp_cand,
-                       "]/../")
-
-  } else if(tmp_type %in% c("Formal", "Informal", "Total")) {
-
-    tmp_root <- paste0("//d1:House/d1:Contests/*/eml:ContestIdentifier[@Id=",
-                       tmp_div,
-                       "]/../d1:FirstPreferences/d1:",
-                       tmp_type,
-                       "/")
-
-  }
-
-  tmp_total <- xml_text(xml_find_all(xml, paste0(tmp_root, "d1:Votes")))
-  tmp_total_hist <- xml_attr(xml_find_all(xml, paste0(tmp_root, "d1:Votes")), "Historic")
-  tmp_total_swing <- xml_attr(xml_find_all(xml, paste0(tmp_root, "d1:Votes")), "Swing")
-  tmp_type_type <- xml_attr(xml_find_all(xml, paste0(tmp_root, "d1:VotesByType/d1:Votes")), "Type")
-  tmp_type_hist <- xml_attr(xml_find_all(xml, paste0(tmp_root, "d1:VotesByType/d1:Votes")), "Historic")
-  tmp_type_swing <- xml_attr(xml_find_all(xml, paste0(tmp_root, "d1:VotesByType/d1:Votes")), "Swing")
-  tmp_type_votes <- xml_text(xml_find_all(xml, paste0(tmp_root, "d1:VotesByType/d1:Votes")))
-
-  tmp_votes_df <- rbind(data.frame(Votes = c(tmp_total, tmp_type_votes),
-                                   Which = c("Votes"),
-                                   VoteType = c("DivTotal", tmp_type_type),
-                                   stringsAsFactors = FALSE),
-                        data.frame(Votes = c(tmp_total_hist, tmp_type_hist),
-                                   Which = c("Historic"),
-                                   VoteType = c("DivTotal", tmp_type_type),
-                                   stringsAsFactors = FALSE),
-                        data.frame(Votes = c(tmp_total_swing, tmp_type_swing),
-                                   Which = c("Swing"),
-                                   VoteType = c("DivTotal", tmp_type_type),
-                                   stringsAsFactors = FALSE))
-  tmp_votes_df$DivisionID <- tmp_div
-  tmp_votes_df$CandidateID <- tmp_cand
-  tmp_votes_df$CandidateType <- tmp_type
-
-  # tmp_votes_df$Votes <- as.integer(tmp_votes_df$Votes)
-
-  return(tmp_votes_df[c("DivisionID", "CandidateID", "CandidateType",
-                        "VoteType", "Which", "Votes")])
-
-}
-
-
 #' Get Media Feed Division IDs
 #'
 #' List division IDs from media feed file.
@@ -307,8 +71,25 @@ get_mediafeed_divisionids <- function(xml) {
 
 }
 
+#' Get Division Details from Media Feed
+#'
+#'
+#'
+#' @param DivisionID A division ID in either character or interger format.
+#' @param xml A pointer to an XML media feed object.
+#'
+#' @return A \code{data.frame}.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' library(purrr)
+#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' map_dfr(get_mediafeed_divisionids(xml), get_mediafeed_division_details, xml)
+#' }
+#'
+#' @importFrom xml2 xml_parent xml_attrs
 get_mediafeed_division_details <- function(DivisionID, xml) {
-  # TODO: Document Me!
 
   tmp_nodes <- xml_parent(xml_find_first(xml, paste0("//eml:ContestIdentifier[@Id=\"", DivisionID, "\"]")))
   div_name <- xml_text(xml_find_first(tmp_nodes, "d1:PollingDistrictIdentifier/d1:Name"))
@@ -337,8 +118,8 @@ get_mediafeed_division_details <- function(DivisionID, xml) {
 
 #' Get Media Feed Votes by Polling Place for Division
 #'
-#' Extract the votes by candidate and polling place for a division
-#' from the media feed.
+#' Extract the votes by candidate and polling place for a division from the
+#' media feed.
 #'
 #' Note: The different vote types are \code{Candidate} (normal candidate votes),
 #' \code{Ghost} (Candidates from previous elections not running in this
@@ -358,7 +139,7 @@ get_mediafeed_division_details <- function(DivisionID, xml) {
 #' \dontrun{
 #' library(purrr)
 #' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
-#' map_dfr(get_mediafeed_divisionids(tmp_2), get_mediafeed_votes_pps, tmp_2)
+#' map_dfr(get_mediafeed_divisionids(xml), get_mediafeed_votes_pps, xml)
 #' }
 get_mediafeed_votes_pps <- function(DivisionID, xml) {
 

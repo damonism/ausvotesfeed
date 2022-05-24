@@ -17,8 +17,8 @@ a \code{data.frame} with seven columns: \code{DivisionID},
   \code{Which} and \code{EventIdentifier}.
 }
 \description{
-Extract the votes by candidate and polling place for a division
-from the media feed.
+Extract the votes by candidate and polling place for a division from the
+media feed.
 }
 \details{
 Note: The different vote types are \code{Candidate} (normal candidate votes),
@@ -31,6 +31,6 @@ preferred votes).
 \dontrun{
 library(purrr)
 xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
-map_dfr(get_mediafeed_divisionids(tmp_2), get_mediafeed_votes_pps, tmp_2)
+map_dfr(get_mediafeed_divisionids(xml), get_mediafeed_votes_pps, xml)
 }
 }
