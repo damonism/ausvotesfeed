@@ -36,7 +36,7 @@ NULL
 get_mediafeed_gender <- function(xml, chamber) {
 
   if(is.na(xml_name(xml_find_first(xml, "d1:CandidateList")))) {
-    stop("'CandidateList' node note found. Is this a EML 230 candidates file?")
+    stop("'CandidateList' node not found. Is this a EML 230 candidates file?")
   }
 
   if(toupper(chamber) == "HOUSE") {
