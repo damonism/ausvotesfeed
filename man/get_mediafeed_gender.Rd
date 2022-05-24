@@ -22,9 +22,10 @@ file in the media feed preload file.
 \details{
 Note that the gender information is only found in the
 \code{eml-230-candidates-(EventId).xml} file, which is in the \code{preload}
-zip file.
+zip file. If the correct XML node identifying this file
+(\code{d1:CandidateList}) is not found, the function will halt with an error.
 
-The easiest way to get the file is to call \code{link{read_mediafeed_xml}}
+The easiest way to get the file is to call \code{\link{read_mediafeed_xml}}
 with "candidates" as the \code{filename} argument,
 }
 \examples{

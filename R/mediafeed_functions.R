@@ -11,7 +11,8 @@ NULL
 #'
 #' Note that the gender information is only found in the
 #' \code{eml-230-candidates-(EventId).xml} file, which is in the \code{preload}
-#' zip file.
+#' zip file. If the correct XML node identifying this file
+#' (\code{d1:CandidateList}) is not found, the function will halt with an error.
 #'
 #' The easiest way to get the file is to call \code{\link{read_mediafeed_xml}}
 #' with "candidates" as the \code{filename} argument,
@@ -30,8 +31,13 @@ NULL
 #' get_mediafeed_gender(xml, chamber = "senate")
 #' }
 #'
-#' @importFrom xml2 read_xml xml_attr xml_find_all xml_find_first xml_text xml_name
+#' @importFrom xml2 read_xml xml_attr xml_find_all xml_find_first xml_text
+#'   xml_name
 get_mediafeed_gender <- function(xml, chamber) {
+
+  if(is.na(xml_name(xml_find_first(xml, "d1:CandidateList")))) {
+    stop("'CandidateList' node note found. Is this a EML 230 candidates file?")
+  }
 
   if(toupper(chamber) == "HOUSE") {
     tmp_chamber <- "H"
