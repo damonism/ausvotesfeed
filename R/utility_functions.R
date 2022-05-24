@@ -83,12 +83,12 @@ download_mediafeed_file <- function(EventIdentifier, Filetype, Detail = "Detaile
 #' by some firewalls. This function works in conjunction with a \code{plumber}
 #' script, which is included in the \code{inst} directory in this package.
 #'
-#' Simply run the include \code{run.R} file in the \code{inst} directory on a
-#' server that can access the media feed FTP server and use the resulting server
-#' address and port with this function to download the latest zipfile of the
-#' appropriate type from the media feed.
+#' Simply run the included \code{run.R} file in the \code{inst/plumber}
+#' directory on a server that can access the media feed FTP server and use the
+#' resulting server address and port with this function to download the latest
+#' zipfile of the appropriate type from the media feed.
 #'
-#' The \code{api.R} file in the \code{inst} directory runs
+#' The \code{api.R} file in the \code{inst/plumber} directory runs
 #' \code{\link{download_mediafeed_file}} with the correct parameters and sends
 #' the resulting file, which is then downloaded by this function.
 #'
@@ -111,8 +111,7 @@ download_mediafeed_file <- function(EventIdentifier, Filetype, Detail = "Detaile
 #'
 #' @examples
 #' \dontrun{
-#' download_mediafeed_api("http://127.0.0.1:3379", 2022, "Preload", Archive = FALSE)
-#' }
+#' download_mediafeed_api("http://127.0.0.1:3379", 2022, "Preload", Archive = FALSE)}
 download_mediafeed_api <- function(Server, EventIdentifier, Filetype, Archive = TRUE) {
 
   if(Filetype == "Preload") {
