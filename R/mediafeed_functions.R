@@ -13,7 +13,7 @@ NULL
 #' \code{eml-230-candidates-(EventId).xml} file, which is in the \code{preload}
 #' zip file.
 #'
-#' The easiest way to get the file is to call \code{link{read_mediafeed_xml}}
+#' The easiest way to get the file is to call \code{\link{read_mediafeed_xml}}
 #' with "candidates" as the \code{filename} argument,
 #'
 #' @param xml A pointer to an XML media feed object.
