@@ -13,7 +13,7 @@ get_mediafeed_divisionids(xml)
 A vector of division IDs.
 }
 \description{
-List division IDs from media feed file.
+List House division IDs from media feed file.
 }
 \examples{
 \dontrun{

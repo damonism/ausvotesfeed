@@ -2,7 +2,7 @@
 % Please edit documentation in R/mediafeed_functions.R
 \name{get_mediafeed_division_status}
 \alias{get_mediafeed_division_status}
-\title{Get division count status from media feed}
+\title{Get House division count status from media feed}
 \usage{
 get_mediafeed_division_status(DivisionID, xml)
 }
