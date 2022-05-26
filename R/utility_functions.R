@@ -196,9 +196,11 @@ read_mediafeed_xml <- function(path, filename = NA) {
 
     # Remove any old XML files
     tmp_old_files <- list.files(tmp_unzipdir, pattern = ".*\\.xml", full.names = TRUE)
-    message("Found ", length(tmp_old_files), " old XML files. Deleting... " , appendLF = FALSE)
-    unlink(tmp_old_files)
-    message("done.")
+    if(length(tmp_old_files) > 0) {
+      message("Found ", length(tmp_old_files), " old XML files. Deleting... " , appendLF = FALSE)
+      unlink(tmp_old_files)
+      message("done.")
+    }
 
     unzip(path, overwrite = TRUE, junkpaths = TRUE, exdir = tmp_unzipdir)
     message("Unzipping to ", tmp_unzipdir)
@@ -210,7 +212,7 @@ read_mediafeed_xml <- function(path, filename = NA) {
     message("Reading XML file: ", tmp_xml_file)
 
     tmp_xml <- xml2::read_xml(tmp_xml_file)
-    message("Created: ", xml_attrs(xml_find_first(results_xml, "/d1:MediaFeed"))[["Created"]])
+    message("Created: ", xml_attrs(xml_find_first(tmp_xml, "/d1:MediaFeed"))[["Created"]])
     return(tmp_xml)
   }
 }
