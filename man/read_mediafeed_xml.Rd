@@ -27,11 +27,11 @@ one downloaded by \code{\link{download_mediafeed_file}}.
 \examples{
 \dontrun{
 # Read a file that you have downloaded yourself
-read_mediafeed_xml("/tmp/aec-mediafeed-Detailed-Preload-27966-20220503123540.zip", "results")
+read_mediafeed_xml("/tmp/aec-mediafeed-Detailed-Preload-27966-20220503123540.zip",
+                   "results")
 
 # Read a file that has been downloaded with read_mediafeed_xml()
-read_mediafeed_xml(download_mediafeed_file(2022, "Preload", "Detailed", "/tmp"))
-}
+read_mediafeed_xml(download_mediafeed_file(2022, "Preload", "Detailed", "/tmp"))}
 
 }
 \seealso{

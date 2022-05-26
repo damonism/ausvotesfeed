@@ -2,7 +2,7 @@
 % Please edit documentation in R/mediafeed_functions.R
 \name{get_mediafeed_gender}
 \alias{get_mediafeed_gender}
-\title{Get Media Feed Gender}
+\title{Get candidate gender from media feed}
 \usage{
 get_mediafeed_gender(xml, chamber)
 }

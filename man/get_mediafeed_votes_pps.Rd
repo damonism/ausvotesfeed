@@ -2,7 +2,7 @@
 % Please edit documentation in R/mediafeed_functions.R
 \name{get_mediafeed_votes_pps}
 \alias{get_mediafeed_votes_pps}
-\title{Get Media Feed Votes by Polling Place for Division}
+\title{Get votes by polling place for division from media feed}
 \usage{
 get_mediafeed_votes_pps(DivisionID, xml)
 }

@@ -153,16 +153,16 @@ download_mediafeed_api <- function(Server, EventIdentifier, Filetype, Archive = 
 #' @examples
 #' \dontrun{
 #' # Read a file that you have downloaded yourself
-#' read_mediafeed_xml("/tmp/aec-mediafeed-Detailed-Preload-27966-20220503123540.zip", "results")
+#' read_mediafeed_xml("/tmp/aec-mediafeed-Detailed-Preload-27966-20220503123540.zip",
+#'                    "results")
 #'
 #' # Read a file that has been downloaded with read_mediafeed_xml()
-#' read_mediafeed_xml(download_mediafeed_file(2022, "Preload", "Detailed", "/tmp"))
-#' }
+#' read_mediafeed_xml(download_mediafeed_file(2022, "Preload", "Detailed", "/tmp"))}
 #'
 #' @seealso \code{\link{download_mediafeed_file}} for downloading the correct
 #'   file from the AEC's FTP site.
 #'
-#' @importFrom xml2 read_xml
+#' @importFrom xml2 read_xml xml_attrs xml_find_first
 #' @importFrom utils unzip tail
 read_mediafeed_xml <- function(path, filename = NA) {
 
@@ -208,6 +208,25 @@ read_mediafeed_xml <- function(path, filename = NA) {
       tmp_xml_file <- list.files(tmp_unzipdir, pattern = paste0("aec-mediafeed-results-.*", vtr_id, "\\.xml"), full.names = TRUE)
     }
     message("Reading XML file: ", tmp_xml_file)
-    return(xml2::read_xml(tmp_xml_file))
+
+    tmp_xml <- xml2::read_xml(tmp_xml_file)
+    message("Created: ", xml_attrs(xml_find_first(results_xml, "/d1:MediaFeed"))[["Created"]])
+    return(tmp_xml)
   }
+}
+
+#' Fill down
+#'
+#' Internal convenience fill down function to avoid including all of \code{tidyr}.
+#'
+#' @param x A vector or \code{data.frame} column.
+#'
+#' @return A vector or \code{data.frame} column.
+#'
+#' @source \url{https://stackoverflow.com/questions/9514504/add-missing-value-in-column-with-value-from-row-above}
+Fill <- function(x)
+{
+  Log <- !is.na(x)
+  y <- x[Log]
+  y[cumsum(Log)]
 }

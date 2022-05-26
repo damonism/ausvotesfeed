@@ -2,7 +2,7 @@
 % Please edit documentation in R/mediafeed_functions.R
 \name{get_mediafeed_divisionids}
 \alias{get_mediafeed_divisionids}
-\title{Get Media Feed Division IDs}
+\title{Get the list of Division IDs from the media feed}
 \usage{
 get_mediafeed_divisionids(xml)
 }
