@@ -1,0 +1,36 @@
+---
+title: "Post-election workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Post-election workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ausvotesfeed)
+```
+
+Download the most recent results file from the media feed:
+
+```{r}
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
+                                                          Filetype = "Verbose",
+                                                          Archive = TRUE))
+```
+
+
+```{r download_api, eval=FALSE, include=FALSE}
+results_xml <- read_mediafeed_xml(download_mediafeed_api("http://ausvotes.org:7995", 
+                                                         2022, 
+                                                         Filetype = "Verbose", 
+                                                         Archive = FALSE))
+```
+

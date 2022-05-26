@@ -11,6 +11,10 @@ LazyData: true
 Depends: xml2,
     curl,
     rappdirs
-Suggests: ausvotes,
-    plumber
+Suggests: 
+    ausvotes,
+    knitr,
+    plumber,
+    rmarkdown
 RoxygenNote: 7.2.0
+VignetteBuilder: knitr
