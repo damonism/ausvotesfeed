@@ -262,7 +262,7 @@ get_mediafeed_candidates <- function(xml, party = FALSE) {
 get_mediafeed_fp_by_pps <- function(xml) {
 
   message("Extracting nodes... ", appendLF = FALSE)
-  tmp_pps_nodes <- xml_find_all(results_xml, "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace")
+  tmp_pps_nodes <- xml_find_all(xml, "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace")
   message("Done.")
 
   # Build the candidates and polling places table
