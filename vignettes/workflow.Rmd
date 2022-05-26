@@ -20,7 +20,7 @@ library(ausvotesfeed)
 
 Download the most recent results file from the media feed:
 
-```{r}
+```{r download}
 results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
                                                           Filetype = "Verbose",
                                                           Archive = TRUE))
@@ -34,3 +34,8 @@ results_xml <- read_mediafeed_xml(download_mediafeed_api("http://ausvotes.org:79
                                                          Archive = FALSE))
 ```
 
+Check when the file was created.
+
+```{r metadata}
+as.POSIXct(get_mediafeed_metadata(results_xml)["Created"], format = "%FT%T")
+```

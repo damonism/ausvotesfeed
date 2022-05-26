@@ -217,6 +217,51 @@ read_mediafeed_xml <- function(path, filename = NA) {
   }
 }
 
+#' Print media feed metadata
+#'
+#' Display metadata from the media feed XML file.
+#'
+#' Display some metadata from the media feed XML file, including when it was
+#' updated, its verbosity and event identifier.
+#'
+#' This should be relatively quick because it only accesses information at the
+#' very top of the file (although there is inevitably some delay in parsing even
+#' the first bit of such a large file).
+#'
+#' The time stamp returned in \code{Created} can be converted with
+#' \code{"\%FT\%T"} as a format string.
+#'
+#' @param xml A pointer to an XML media feed object.
+#' @param short \code{TRUE} to display just the most important items (default)
+#'   or \code{FALSE} to display everything.
+#'
+#' @return A named vector.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' get_mediafeed_metadata(results_xml)}
+#'
+#' @importFrom xml2 xml_attrs xml_find_first
+get_mediafeed_metadata <- function(xml, short = TRUE) {
+
+  # tmp_created <- xml_attrs(xml_find_first(xml, "/d1:MediaFeed"))[["Created"]]
+  #
+  # return(tmp_created)
+
+  tmp_metadata <- c(xml_attrs(xml_find_first(xml, "/d1:MediaFeed")),
+                    xml_attrs(xml_find_first(xml, "d1:Results")),
+                    EventIdentifier = xml_attrs(xml_find_first(xml, "d1:Results/eml:EventIdentifier"))[[1]])
+  # tmp_metadata["Created"] <- as.POSIXct(tmp_metadata["Created"], format = "%FT%T")
+
+  if(short) {
+    return(tmp_metadata[c("Created", "Phase", "Verbosity", "Granularity", "EventIdentifier")])
+  }else {
+    return(tmp_metadata)
+  }
+}
+
 #' Fill down
 #'
 #' Internal convenience fill down function to avoid including all of \code{tidyr}.
