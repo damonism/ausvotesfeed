@@ -1,5 +1,31 @@
 #' Extract election data from media feed preload files
 #'
+#' This is a collection of functions that are designed to be run on the preload
+#' media feed files (in fact they check that they're running on the preload
+#' files because at least one of them depends on a set of nodes that is only in
+#' the preload files - the \code{//d1:Analysis} nodes).
+#'
+#' The intention is that these functions are run on the preload file before the
+#' election (or before any other results are analysed) to build tables that can
+#' be joined against the results files. Extracting this data is (relatively)
+#' slow, and extracting the results is as quick as it can be.
+#'
+#' The functions included in this family are:
+#'
+#' \itemize{
+#'
+#' \item{\code{\link{get_mediafeed_preload_parties}}}{Get parties from preload
+#' media feed file}
+#'
+#' \item{\code{\link{get_mediafeed_preload_candidates}}}{Get candidates from
+#' preload media feed file}
+#'
+#' \item{\code{\link{get_mediafeed_preload_pps}}}{Get polling places from
+#' preload media feed file}
+#'
+#' \item{\code{\link{get_mediafeed_preload_divs}}}{Get divisions from preload
+#' media feed file} }
+#'
 #' @name mediafeed_preload_functions
 #'
 NULL
@@ -9,20 +35,20 @@ NULL
 #' Extract a table of parties, party IDs and shortcodes from the preload XML
 #' file.
 #'
-#' @param xml A pointer to an XML preload media feed object
+#' @param xml A pointer to an XML preload media feed object.
 #'
-#' @return
-#' @export A \code{data.frame} with three variables: \code{PartyGroupId}
+#' @return A \code{data.frame} with three variables: \code{PartyGroupId}
 #'   (\code{INT}), \code{PartyGroupShortCode} and \code{PartyGroupName}.
+#' @export
 #'
 #' @examples
 #' \dontrun{
 #' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
 #'                                                           "Preload",
-#'                                                           Archive = FALSE),
+#'                                                           Archive = TRUE),
 #'                                   "results")
-#'  get_mediafeed_preload_parties(preload_xml)}
-#'  @importFrom xml2 xml_find_all xml_attrs xml_text
+#' get_mediafeed_preload_parties(preload_xml)}
+#' @importFrom xml2 xml_find_all xml_attrs xml_text
 get_mediafeed_preload_parties <- function(xml) {
 
   if(get_mediafeed_metadata(xml)["Phase"] == "Preload") {
@@ -43,6 +69,40 @@ get_mediafeed_preload_parties <- function(xml) {
   }
 }
 
+#' Get polling places from preload media feed file
+#'
+#' Get polling places and their associated divisions from the preload media feed
+#' XML file.
+#'
+#' Note that the division name is not included is the output of this function,
+#' only the \code{DivisionId} and \code{DivisionShortCode}. To get
+#' \code{DivisionNm}, join this file with the output of
+#' \code{\link{get_mediafeed_preload_divs}} on \code{DivisionId}.
+#'
+#' Most of the polling places to not have a \code{PollingPlaceClassification}
+#' (that is, they are \code{NA}). As of the 2022 federal election, the
+#' classifications are \code{PrePollVotingCentre}, \code{SpecialHospital},
+#' \code{PrisonMobile} and \code{RemoteMobile}.
+#'
+#' The blind and low vision telephone voting (and for 2022 the COVID telephone
+#' voting) are classed as \code{PrePollVotingCentre} polling places, but are
+#' only identifiable by the \code{PollingPlaceName}.
+#'
+#' @param xml A pointer to an XML preload media feed object.
+#'
+#' @return A \code{data.frame} with five variables: \code{DivisionId},
+#'   \code{DivisionShortCode}, \code{PollingPlaceId}, \code{PollingPlaceName}
+#'   and \code{PollingPlaceClassification}.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
+#'                                                           "Preload",
+#'                                                           Archive = TRUE),
+#'                                   "results")
+#' get_mediafeed_preload_pps(preload_xml)}
+#' @importFrom xml2 xml_find_all xml_attrs xml_attr xml_name
 get_mediafeed_preload_pps <- function(xml) {
 
   if(get_mediafeed_metadata(xml)["Phase"] != "Preload") {
@@ -78,6 +138,40 @@ get_mediafeed_preload_pps <- function(xml) {
 
 }
 
+#' Get divisions from preload media feed file
+#'
+#' Get divisions and enrolments from the preload media feed XML file.
+#'
+#' This function extracts the divisions and their associated identifiers
+#' (including \code{DivisionShortCode}, which only seems to be used in the media
+#' feed and nowhere else).
+#'
+#' Note that \code{\link{get_mediafeed_preload_pps}} includes \code{DivisionId}
+#' and \code{DivisionShortName} but not \code{DivisonNm} - this is the only of
+#' the preload functions where division name is available, so it makes sense to
+#' join this table to the polling place table by \code{DivisionId}.
+#'
+#' This function also outputs various enrolment numbers for the division.
+#' \code{EnrolmentHistoric} can be used for enrolment swing calculations, but
+#' it's not immediately clear whether \code{Enrolment} or
+#' \code{Enrolment.CloseOfRolls} is the most correct number for calculating
+#' turnout.
+#'
+#' @param xml A pointer to an XML preload media feed object.
+#'
+#' @return a \code{data.frame} with seven variables: \code{DivisionId},
+#'   \code{DivisionShortCode} (a four-character code for the division),
+#'   \code{DivisionNm}, \code{StateAb}, \code{Enrolment.CloseOfRolls},
+#'   \code{Enrolment.Historic} and \code{Enrolment}
+#' @export
+#'
+#' @examples
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
+#'                                                           "Preload",
+#'                                                           Archive = TRUE),
+#'                                   "results")
+#'  get_mediafeed_preload_divs(preload_xml)
+#' @importFrom xml2 xml_find_all xml_attr xml_attrs
 get_mediafeed_preload_divs <- function(xml) {
 
   if(get_mediafeed_metadata(xml)["Phase"] != "Preload") {
@@ -108,6 +202,20 @@ get_mediafeed_preload_divs <- function(xml) {
   return(tmp_df)
 }
 
+#' Get candidates from preload media feed file
+#'
+#' @param xml A pointer to an XML preload media feed object
+#'
+#' @return A \code{data.frame} with 20 variables.
+#' @export
+#'
+#' @examples
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
+#'                                                           "Preload",
+#'                                                           Archive = TRUE),
+#'                                   "results")
+#' get_mediafeed_preload_candidates(preload_xml)
+#' @importFrom xml2 xml_find_all xml_find_first xml_attrs xml_attr xml_text
 get_mediafeed_preload_candidates <- function(xml) {
 
   if(get_mediafeed_metadata(xml)["Phase"] != "Preload") {
