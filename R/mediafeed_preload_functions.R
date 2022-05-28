@@ -38,12 +38,13 @@
 #'
 NULL
 
-#' Get parties from preload media feed file
+#' Get party groups from preload media feed file
 #'
-#' Extract a table of parties, party IDs and shortcodes from the preload XML
-#' file.
+#' Extract a table of party group, IDs and shortcodes from the preload XML file.
 #'
-#' Note that party groups are not the same as the parties listed in the candidate extract.
+#' Note that party groups are not the same as the parties listed in the
+#' candidate extract. I'm not sure that there is any way to determine which
+#' parties are members of which groups from just the preload files.
 #'
 #' @param xml A pointer to an XML preload media feed object.
 #'
@@ -57,7 +58,7 @@ NULL
 #'                                   "results")
 #' get_mediafeed_preload_parties(preload_xml)}
 #' @importFrom xml2 xml_find_all xml_attrs xml_text
-get_mediafeed_preload_parties <- function(xml) {
+get_mediafeed_preload_partygroups <- function(xml) {
 
   if(get_mediafeed_metadata(xml)["Phase"] == "Preload") {
 
