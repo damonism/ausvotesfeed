@@ -24,7 +24,7 @@ only the \code{DivisionId} and \code{DivisionShortCode}. To get
 \code{DivisionNm}, join this file with the output of
 \code{\link{get_mediafeed_preload_divs}} on \code{DivisionId}.
 
-Most of the polling places to not have a \code{PollingPlaceClassification}
+Most of the polling places do not have a \code{PollingPlaceClassification}
 (that is, they are \code{NA}). As of the 2022 federal election, the
 classifications are \code{PrePollVotingCentre}, \code{SpecialHospital},
 \code{PrisonMobile} and \code{RemoteMobile}.

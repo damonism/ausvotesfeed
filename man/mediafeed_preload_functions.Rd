@@ -29,5 +29,13 @@ preload media feed file}
 preload media feed file}
 
 \item{\code{\link{get_mediafeed_preload_divs}}}{Get divisions from preload
-media feed file} }
+media feed file}
+
+\item{\code{\link{get_mediafeed_preload_votes_type}}}{Get vote type table
+from preload media feed file}
+
+\item{\code{\link{get_mediafeed_preload_gender}}}{Get candidate gender from
+preload media feed}
+
+}
 }
