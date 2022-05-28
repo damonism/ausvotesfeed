@@ -34,10 +34,7 @@ voting) are classed as \code{PrePollVotingCentre} polling places, but are
 only identifiable by the \code{PollingPlaceName}.
 }
 \examples{
-\dontrun{
-preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-                                                          "Preload",
-                                                          Archive = TRUE),
+preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
                                   "results")
-get_mediafeed_preload_pps(preload_xml)}
+get_mediafeed_preload_pps(preload_xml)
 }

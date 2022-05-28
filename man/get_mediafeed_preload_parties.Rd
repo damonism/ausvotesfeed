@@ -17,11 +17,12 @@ A \code{data.frame} with three variables: \code{PartyGroupId}
 Extract a table of parties, party IDs and shortcodes from the preload XML
 file.
 }
+\details{
+Note that party groups are not the same as the parties listed in the candidate extract.
+}
 \examples{
 \dontrun{
-preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-                                                          "Preload",
-                                                          Archive = TRUE),
+preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
                                   "results")
 get_mediafeed_preload_parties(preload_xml)}
 }

@@ -43,6 +43,8 @@ NULL
 #' Extract a table of parties, party IDs and shortcodes from the preload XML
 #' file.
 #'
+#' Note that party groups are not the same as the parties listed in the candidate extract.
+#'
 #' @param xml A pointer to an XML preload media feed object.
 #'
 #' @return A \code{data.frame} with three variables: \code{PartyGroupId}
@@ -51,9 +53,7 @@ NULL
 #'
 #' @examples
 #' \dontrun{
-#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-#'                                                           "Preload",
-#'                                                           Archive = TRUE),
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
 #'                                   "results")
 #' get_mediafeed_preload_parties(preload_xml)}
 #' @importFrom xml2 xml_find_all xml_attrs xml_text
@@ -104,12 +104,9 @@ get_mediafeed_preload_parties <- function(xml) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-#'                                                           "Preload",
-#'                                                           Archive = TRUE),
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
 #'                                   "results")
-#' get_mediafeed_preload_pps(preload_xml)}
+#' get_mediafeed_preload_pps(preload_xml)
 #' @importFrom xml2 xml_find_all xml_attrs xml_attr xml_name
 get_mediafeed_preload_pps <- function(xml) {
 
@@ -131,7 +128,7 @@ get_mediafeed_preload_pps <- function(xml) {
   tmp_df <- data.frame(tmp_type,
                        PollingPlaceId = tmp_id,
                        DivisionShortCode = tmp_div_code,
-                       PollingPlaceName = tmp_pps_name,
+                       PollingPlaceNm = tmp_pps_name,
                        PollingPlaceClassification = tmp_pps_clas,
                        stringsAsFactors = FALSE)
 
@@ -142,7 +139,7 @@ get_mediafeed_preload_pps <- function(xml) {
 
   # tmp_df$tmp_type <- NULL
   tmp_df[c("DivisionId", "PollingPlaceId")] <- sapply(tmp_df[c("DivisionId", "PollingPlaceId")], as.integer)
-  tmp_df[c("DivisionId", "DivisionShortCode", "PollingPlaceId", "PollingPlaceName", "PollingPlaceClassification")]
+  tmp_df[c("DivisionId", "DivisionShortCode", "PollingPlaceId", "PollingPlaceNm", "PollingPlaceClassification")]
 
 }
 
