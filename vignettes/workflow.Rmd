@@ -16,16 +16,35 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(ausvotesfeed)
+library(dplyr)
 ```
 
-Download the most recent results file from the media feed:
+This is a walk-through of a post-election workflow of accessing results from the AEC's Virtual Tally Room (VTR) media feed based around `ausvotesfeed`.
+
+It is designed to show you how to setup candidate, party, division and polling place tables from the pre-load files, complete with historic election results and 'ghost' candidates (candidates from previous elections that are not contesting the current election, which are included for the purpose of calculating swings).
+
+Once these tables are set up it is possible to extract results from the media feeds as they become available in a relatively minimal and (importantly) quick format, and to merge those results with the preload tables.
+
+## Pre-load details
+
+The media feed is hosted on an anonymous FTP server. During the election the AEC makes the live results available on [ftp://mediafeed.aec.gov.au], however that site is only available during the election. The rest of the time there is an archive of old media feeds available at [ftp://mediafeedarchive.aec.gov.au]. 
+
+The functions that access the files on the media feed take this into account, and during the election period if the `Archive` switch is set to `FALSE` the files on the media feed for the active election will be used. At all other times, set `Archive` to `TRUE` (the default). 
+
+Download the most recent preload file from the media feed:
 
 ```{r download}
-results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
-                                                          Filetype = "Verbose",
-                                                          Archive = TRUE))
+preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
+                                                          Filetype = "Preload",
+                                                          Archive = TRUE),
+                                  filename = "results")
 ```
 
+The zip file for the preload has a number of files, and so when `read_mediafeed_xml()` is used with a preload file, it will require a `filename` to be specified. 
+
+Anonymous FTP is somewhat archaic and is often blocked for security reasons. In order to get around this, the package includes some files that are installed into the `plumber` folder of the package which will create an API server to relay the media feed files. 
+
+Hopefully you don't need this, but if you do, run the `plumber` files on a server that can access the FTP site and use `download_mediafeed_api()` as a drop-in replacement for `download_mediafeed_file()`.
 
 ```{r download_api, eval=FALSE, include=FALSE}
 results_xml <- read_mediafeed_xml(download_mediafeed_api("http://ausvotes.org:7995", 
@@ -34,8 +53,66 @@ results_xml <- read_mediafeed_xml(download_mediafeed_api("http://ausvotes.org:79
                                                          Archive = FALSE))
 ```
 
-Check when the file was created.
+The `read_mediafeed_xml()` function provides an `xml2` pointer to the resulting XML file, and is designed to be a replacement for `read_xml()` from that package that works with the particular combination of files returned by the mediafeed. 
+
+Check when the file was created. The time strings used throughout the media feed can be converted to R time objects using `%FT%T` as a format string. Generally the functions should return `POSIXct` time objects where the media feed returns a date stamp, but this is handy for when it does.
 
 ```{r metadata}
-as.POSIXct(get_mediafeed_metadata(results_xml)["Created"], format = "%FT%T")
+as.POSIXct(get_mediafeed_metadata(preload_xml)["Created"], format = "%FT%T")
+```
+
+### Populate pre-load tables
+
+A series of (relatively) slow functions extract all of the relevant election information from the preload files, which can then be merged with results particularly by `CandidateId`, `DivisionId` and `PollingPlaceId` (which should always be returned as `INT`).
+
+#### Candidates
+
+The candidates extract also includes first preference votes, although only the historic votes are non-zero.
+
+```{r preload_cand}
+mf_cand <- get_mediafeed_preload_candidates(preload_xml)
+```
+
+Gender is available from the `candidates` file in the preload zip file. If you want to include it with the candidates data.frame, use `get_mediafeed_preload_gender()` and merge it on `CandidateId`. 
+
+Note that there is no available gender for _ghost_ candidates.
+
+```{r preload_gender}
+cand_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
+                                                       Filetype = "Preload",
+                                                       Archive = TRUE),
+                               filename = "candidates")
+
+mf_cand <- mf_cand %>% 
+  left_join(get_mediafeed_preload_gender(cand_xml, "House") %>% 
+  select(CandidateId, Gender),
+  by = "CandidateId")
+```
+
+#### Divisions
+
+```{r preload_div}
+mf_div <- get_mediafeed_preload_divs(preload_xml)
+```
+
+#### Polling places
+
+```{r preload_pps}
+mf_pps <- get_mediafeed_preload_pps(preload_xml)
+```
+
+#### Votes by type
+
+```{r preload_votes_type}
+mf_votes <- get_mediafeed_preload_votes_type(preload_xml)
+```
+
+
+
+## Election results
+
+```{r download_results}
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
+                                                          Filetype = "Verbose",
+                                                          Archive = TRUE))
 ```

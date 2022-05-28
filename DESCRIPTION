@@ -15,6 +15,7 @@ Suggests:
     ausvotes,
     knitr,
     plumber,
-    rmarkdown
+    rmarkdown,
+    dplyr
 RoxygenNote: 7.2.0
 VignetteBuilder: knitr
