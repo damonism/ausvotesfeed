@@ -212,7 +212,11 @@ read_mediafeed_xml <- function(path, filename = NA) {
     message("Reading XML file: ", tmp_xml_file)
 
     tmp_xml <- xml2::read_xml(tmp_xml_file)
-    message("Created: ", xml_attrs(xml_find_first(tmp_xml, "/d1:MediaFeed"))[["Created"]])
+    if(!filename %in% c("candidates", "event")) {
+    message("Created: ",
+            as.POSIXct(xml_attrs(xml_find_first(tmp_xml, "/d1:MediaFeed"))[["Created"]],
+                       format = "%FT%T"))
+    }
     return(tmp_xml)
   }
 }
