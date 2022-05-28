@@ -16,6 +16,12 @@
 #'
 #' The functions in this family are:
 #'
+#' \itemize{
+#'
+#' \item{\code{\link{get_mediafeed_votes_pps_fp}}}{Get first preference votes by polling place}
+#'
+#' }
+#'
 #'
 #'
 #' @name get_mediafeed_votes_pps

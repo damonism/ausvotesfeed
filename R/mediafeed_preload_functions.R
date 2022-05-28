@@ -210,9 +210,7 @@ get_mediafeed_preload_divs <- function(xml) {
 #' @export
 #'
 #' @examples
-#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-#'                                                           "Preload",
-#'                                                           Archive = TRUE),
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,  "Preload", Archive = TRUE),
 #'                                   "results")
 #' get_mediafeed_preload_candidates(preload_xml)
 #' @importFrom xml2 xml_find_all xml_find_first xml_attrs xml_attr xml_text
@@ -310,5 +308,84 @@ get_mediafeed_preload_candidates <- function(xml) {
                 "IsIndependent", "PartyId", "PartyCode", "PartyNm",
                 "Elected", "ElectedHistoric", "Incumbent", "IncumbentNotional",
                 "FP.Votes", "FP.Percentage", "FP.Swing", "FP.Historic", "FP.MatchedHistoric")]
+
+}
+
+#' Get vote type table from preload media feed file
+#'
+#' Extract votes by type (Ordinary, Absent, Provisional, PrePoll or Postal) from
+#' the media feed.
+#'
+#' This just calls \code{\link{get_mediafeed_votes_type}} on the preload file
+#' for first preference votes, and returns historic votes by type.
+#'
+#' @param xml A pointer to an XML preload media feed object
+#'
+#' @return a \code{data.frame}. See \code{\link{get_mediafeed_votes_type}} for
+#'   details.
+#' @export
+#'
+#' @examples
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,  "Preload", Archive = TRUE),
+#'                                   "results")
+#' get_mediafeed_preload_votes_type(preload_xml)
+get_mediafeed_preload_votes_type <- function(xml) {
+
+  if(get_mediafeed_metadata(xml)["Phase"] != "Preload") {
+    stop("This function should only be used with a preload file.")
+  }
+
+  get_mediafeed_votes_type(xml, count = "fp")
+}
+
+#' Get candidate gender from preload media feed
+#'
+#' Create a \code{data.frame} of candidate IDs and gender from the candidates
+#' file in the media feed preload file.
+#'
+#' Note that the gender information is only found in the
+#' \code{eml-230-candidates-(EventId).xml} file, which is in the \code{preload}
+#' zip file. If the correct XML node identifying this file
+#' (\code{d1:CandidateList}) is not found, the function will halt with an error.
+#'
+#' The easiest way to get the file is to call \code{\link{read_mediafeed_xml}}
+#' with "candidates" as the \code{filename} argument,
+#'
+#' @param xml A pointer to an XML media feed object.
+#' @param chamber One of either \code{House} or \code{Senate}.
+#'
+#' @return A \code{data.frame} with three columns: \code{CandidateId},
+#'   \code{Gender} ("male" or "female"), and \code{EventId}
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' file <- download_mediafeed_file(2022, "Preload", "Detailed")
+#' xml <- read_mediafeed_xml(file, "candidates")
+#' get_mediafeed_preload_gender(xml, chamber = "senate")}
+#'
+#' @importFrom xml2 read_xml xml_attr xml_find_all xml_find_first xml_text
+#'   xml_name
+get_mediafeed_preload_gender <- function(xml, chamber) {
+
+  if(is.na(xml_name(xml_find_first(xml, "d1:CandidateList")))) {
+    stop("'CandidateList' node not found. Is this a EML 230 candidates file?")
+  }
+
+  if(toupper(chamber) == "HOUSE") {
+    tmp_chamber <- "H"
+  } else if(toupper(chamber) == "SENATE") {
+    tmp_chamber <- "S"
+  } else {
+    stop("chamber must be either 'house' or 'senate'")
+  }
+
+  tmp_df <- data.frame(CandidateId = as.integer(xml_attr(xml_find_all(xml,
+                                                                      paste0("//d1:ElectionIdentifier[@Id=\"", tmp_chamber, "\"]/../d1:Contest/d1:Candidate/d1:CandidateIdentifier")), "Id")),
+                       Gender = xml_text(xml_find_all(xml, paste0("//d1:ElectionIdentifier[@Id=\"", tmp_chamber, "\"]/../d1:Contest/d1:Candidate/d1:Gender"))),
+                       stringsAsFactors = FALSE)
+  tmp_df$EventId <- as.integer(xml_attr(xml_find_first(xml, "/*/*/d1:EventIdentifier"), "Id"))
+
+  return(tmp_df)
 
 }

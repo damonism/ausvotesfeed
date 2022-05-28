@@ -16,9 +16,7 @@ A \code{data.frame} with 20 variables.
 Get candidates from preload media feed file
 }
 \examples{
-preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-                                                          "Preload",
-                                                          Archive = TRUE),
+preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,  "Preload", Archive = TRUE),
                                   "results")
 get_mediafeed_preload_candidates(preload_xml)
 }

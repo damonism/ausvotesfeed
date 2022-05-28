@@ -38,6 +38,12 @@ joining on an existing details file.
 
 The functions in this family are:
 
+\itemize{
+
+\item{\code{\link{get_mediafeed_votes_pps_fp}}}{Get first preference votes by polling place}
+
+}
+
 Note: The different vote types are \code{Candidate} (normal candidate votes),
 \code{Ghost} (Candidates from previous elections not running in this
 election, included for swing purpose), \code{Formal} (total formal votes),

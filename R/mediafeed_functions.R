@@ -4,59 +4,6 @@
 #'
 NULL
 
-#' Get candidate gender from media feed
-#'
-#' Create a \code{data.frame} of candidate IDs and gender from the candidates
-#' file in the media feed preload file.
-#'
-#' Note that the gender information is only found in the
-#' \code{eml-230-candidates-(EventId).xml} file, which is in the \code{preload}
-#' zip file. If the correct XML node identifying this file
-#' (\code{d1:CandidateList}) is not found, the function will halt with an error.
-#'
-#' The easiest way to get the file is to call \code{\link{read_mediafeed_xml}}
-#' with "candidates" as the \code{filename} argument,
-#'
-#' @param xml A pointer to an XML media feed object.
-#' @param chamber One of either \code{House} or \code{Senate}.
-#'
-#' @return A \code{data.frame} with three columns: \code{CandidateId},
-#'   \code{Gender} ("male" or "female"), and \code{EventId}
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' file <- download_mediafeed_file(2022, "Preload", "Detailed")
-#' xml <- read_mediafeed_xml(file, "candidates")
-#' get_mediafeed_gender(xml, chamber = "senate")
-#' }
-#'
-#' @importFrom xml2 read_xml xml_attr xml_find_all xml_find_first xml_text
-#'   xml_name
-get_mediafeed_gender <- function(xml, chamber) {
-
-  if(is.na(xml_name(xml_find_first(xml, "d1:CandidateList")))) {
-    stop("'CandidateList' node not found. Is this a EML 230 candidates file?")
-  }
-
-  if(toupper(chamber) == "HOUSE") {
-    tmp_chamber <- "H"
-  } else if(toupper(chamber) == "SENATE") {
-    tmp_chamber <- "S"
-  } else {
-    stop("chamber must be either 'house' or 'senate'")
-  }
-
-  tmp_df <- data.frame(CandidateId = as.integer(xml_attr(xml_find_all(xml,
-                                                                      paste0("//d1:ElectionIdentifier[@Id=\"", tmp_chamber, "\"]/../d1:Contest/d1:Candidate/d1:CandidateIdentifier")), "Id")),
-                         Gender = xml_text(xml_find_all(xml, paste0("//d1:ElectionIdentifier[@Id=\"", tmp_chamber, "\"]/../d1:Contest/d1:Candidate/d1:Gender"))),
-                         stringsAsFactors = FALSE)
-  tmp_df$EventId <- as.integer(xml_attr(xml_find_first(xml, "/*/*/d1:EventIdentifier"), "Id"))
-
-  return(tmp_df)
-
-}
-
 #' Get the list of Division IDs from the media feed
 #'
 #' List House division IDs from media feed file.
@@ -312,5 +259,106 @@ get_mediafeed_votes_pps <- function(DivisionID, xml) {
 
   return(tmp_return)
 
+}
+
+#' Get votes by type from the media feed
+#'
+#' Extract votes by type (Ordinary, Absent, Provisional, PrePoll or Postal) from
+#' the media feed.
+#'
+#' All of the vote types except \code{Ordinary} votes are types of declaration
+#' votes.
+#'
+#' It is important to note that the \code{PrePoll} votes returned by this
+#' function are pre-poll declaration votes, which are pre-poll votes cast
+#' outside the elector's division. Pre-poll ordinary votes are what most people
+#' mean by "pre-poll votes". These can be found through the
+#' \code{\link{get_mediafeed_preload_pps}} function, and have a
+#' \code{PollingPlaceClassification} of \code{PrePollVotingCentre}.
+#'
+#' Note that for maximum extract speed the data is extracted in the tabular
+#' format that it appears in the media feed XML file, which is probably not
+#' optimal for most analysis. For best results, the resulting \code{data.frame}
+#' should probably be pivoted into a \code{tidyr} "long" format.
+#'
+#' @param xml A pointer to an XML media feed object.
+#' @param count Currently \code{fp} for first preferences or \code{tcp} for
+#'   two-candidate preferred.
+#'
+#' @return a \code{data.frame} with seven variables: \code{CandidateId},
+#'   \code{DivisionId}, \code{Type} (\code{Ordinary}, \code{Absent},
+#'   \code{Provisional}, \code{PrePoll}, \code{Postal}), \code{Historic},
+#'   \code{Percentage}, \code{Swing} and \code{Votes}.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_votes_type(results_xml, count = "fp")}
+#' @importFrom xml2 xml_find_all xml_attr xml_attrs xml_name xml_text
+get_mediafeed_votes_type <- function(xml, count = "fp") {
+  # NOTE: I think this is the most efficient strategy to get the results data
+  #       and I will probably convert the other functions over to this approach
+  #       when I get a chance. (DM 2022-05-28)
+
+  tmp_metadata <- get_mediafeed_metadata(xml, short = FALSE)
+
+  if(tolower(count) == "fp") {
+
+    tmp_path <- paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Candidate/eml:CandidateIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Candidate/d1:VotesByType/d1:Votes",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Ghost/eml:CandidateIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Ghost/d1:VotesByType/d1:Votes",
+                      sep = "|")
+
+  } else if(tolower(count) == "tcp") {
+
+    if(tmp_metadata["Phase"] == "Preload") {
+      stop("TCP information is not present in the Preload file.")
+    }
+
+    tmp_path <- paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoCandidatePreferred/d1:Candidate/eml:CandidateIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoCandidatePreferred/d1:Candidate/d1:VotesByType/d1:Votes",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoCandidatePreferred/d1:Ghost/eml:CandidateIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoCandidatePreferred/d1:Ghost/d1:VotesByType/d1:Votes",
+                      sep = "|")
+
+  } else if(tolower(count) == "tpp") {
+    stop("TPP is currently not implemented")
+    tmp_path <- paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoPartyPreferred/d1:Coalition/d1:CoalitionIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoPartyPreferred/d1:Coalition/d1:CoalitionIdentifier/d1:VotesByType/d1:Votes",
+                      sep = "|")
+
+  } else {
+    stop("count must be one of 'fp', 'tcp' or 'tpp'.")
+  }
+
+  tmp_votes_nodes <- xml_find_all(xml, tmp_path)
+
+  tmp_votes <- data.frame(as.data.frame(do.call("rbind", xml_attrs(tmp_votes_nodes))),
+                          Votes = xml_text(tmp_votes_nodes),
+                          stringsAsFactors = FALSE)
+
+  tmp_df <- data.frame(Id = xml_attr(tmp_votes_nodes, "Id"),
+                       Name = xml_name(tmp_votes_nodes),
+                       tmp_votes,
+                       stringsAsFactors = FALSE)
+
+  tmp_df$DivisionId <- ifelse(tmp_df$Name == "PollingDistrictIdentifier", tmp_df$Id, NA)
+  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df <- tmp_df[tmp_df$Name != "PollingDistrictIdentifier",]
+  # CandidateId needs to be done after DivisionId
+  tmp_df$CandidateId <- ifelse(tmp_df$Name == "CandidateIdentifier", tmp_df$Id, NA)
+  tmp_df$CandidateId <- Fill(tmp_df$CandidateId)
+  tmp_df <- tmp_df[tmp_df$Name != "CandidateIdentifier",]
+
+  tmp_df <- tmp_df[c("CandidateId", "DivisionId", colnames(tmp_votes))]
+  tmp_df[c("CandidateId", "DivisionId", "Historic", "Votes")] <- sapply(tmp_df[c("CandidateId", "DivisionId", "Historic", "Votes")], as.integer)
+  tmp_df[c("Percentage", "Swing")] <- sapply(tmp_df[c("Percentage", "Swing")], as.numeric)
+
+  return(tmp_df)
 }
 
