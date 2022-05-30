@@ -80,7 +80,7 @@ get_mediafeed_division_status <- function(DivisionID, xml) {
 
 }
 
-#' Get House election candidate details from results media feed
+#' DEPRECATECD: Get House election candidate details from results media feed
 #'
 #' List all of the candidates in the results media feed, along with their
 #' CandidateId and PartyId, mostly for merging with results by CandidateId.
@@ -105,7 +105,6 @@ get_mediafeed_division_status <- function(DivisionID, xml) {
 #'
 #' @return A \code{data.frame} with 9 variables (10 if \code{party} is
 #'   \code{TRUE}).
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -187,7 +186,7 @@ get_mediafeed_candidates <- function(xml, party = FALSE) {
 #   return(tmp_df)
 # }
 
-#' Get votes by polling place for division from media feed
+#' DEPRECATED: Get votes by polling place for division from media feed
 #'
 #' Extract the votes by candidate and polling place for a division from the
 #' media feed.
@@ -204,7 +203,6 @@ get_mediafeed_candidates <- function(xml, party = FALSE) {
 #' @return a \code{data.frame} with seven columns: \code{DivisionID},
 #'   \code{PollingPlaceID}, \code{CandidateID}, \code{CandidateType},
 #'   \code{Which} and \code{EventIdentifier}.
-#' @export
 #'
 #' @examples
 #' \dontrun{

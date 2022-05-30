@@ -2,7 +2,7 @@
 % Please edit documentation in R/mediafeed_functions.R
 \name{get_mediafeed_candidates}
 \alias{get_mediafeed_candidates}
-\title{Get House election candidate details from results media feed}
+\title{DEPRECATECD: Get House election candidate details from results media feed}
 \usage{
 get_mediafeed_candidates(xml, party = FALSE)
 }
