@@ -72,6 +72,8 @@ The candidates extract also includes first preference votes, although only the h
 
 ```{r preload_cand}
 mf_cand <- get_mediafeed_preload_candidates(preload_xml)
+
+head(mf_cand)
 ```
 
 Gender is available from the `candidates` file in the preload zip file. If you want to include it with the candidates data.frame, use `get_mediafeed_preload_gender()` and merge it on `CandidateId`. 
@@ -88,26 +90,51 @@ mf_cand <- mf_cand %>%
   left_join(get_mediafeed_preload_gender(cand_xml, "House") %>% 
   select(CandidateId, Gender),
   by = "CandidateId")
+
+head(mf_cand)
 ```
 
 #### Divisions
 
 ```{r preload_div}
 mf_div <- get_mediafeed_preload_divs(preload_xml)
+
+head(mf_div)
 ```
 
 #### Polling places
 
+In practice, this is probably more useful than the division table for most purposes because it includes both division (`DivisionNm` and `DivisionId`) and state (`StateAb`).
+
 ```{r preload_pps}
 mf_pps <- get_mediafeed_preload_pps(preload_xml)
+
+head(mf_pps)
 ```
+The actual results file returns a table of each candidate for each polling place, and the `get_mediafeed_preload_pps_cand()` function returns a table in that format, which can be easily merged with the results when they are retrieved. 
+
+Unfortunately this is not possible for the TCP results, because TCP candidates are not included in the preload file. 
+```{r}
+mf_pps_cand <- get_mediafeed_preload_pps_cand(preload_xml)
+
+head(mf_pps_cand)
+
+```
+
 
 #### Votes by type
 
 ```{r preload_votes_type}
 mf_votes <- get_mediafeed_preload_votes_type(preload_xml)
+
+head(mf_votes)
 ```
 
+It makes sense to save these so you can access them later.
+
+```{r}
+save(list = ls(pattern = "mf_"), file = "preload_2022.rds")
+```
 
 
 ## Election results
@@ -117,3 +144,35 @@ results_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
                                                           Filetype = "Verbose",
                                                           Archive = FALSE))
 ```
+
+Another way to do this if you just want to quickly get the results of the current election is:
+
+```{r eval=FALSE, include=FALSE}
+results_xml <- fetch_mediafeed_results(2020)
+```
+
+### Results by polling place
+
+This is perhaps the slowest operation, which is the votes by polling place. But it essentially provides everything you need to do most analysis.
+
+```{r votes_pps}
+votes_pps_fp <- get_mediafeed_votes_pps_fp(results_xml)
+votes_pps_tcp <- get_mediafeed_votes_pps_tcp(results_xml)
+```
+
+Merge these with the results of `get_mediafeed_preload_pps()` for analysis by state and division, but note that this file does not include the votes by type. We need to get those separately.
+
+```{r}
+votes_pps_fp <- votes_pps_fp %>% 
+  left_join(mf_pps, by = "PollingPlaceId")
+
+head(votes_pps_fp)
+```
+
+```{r}
+votes_pps_tcp <- votes_pps_tcp %>% 
+  left_join(mf_pps, by = "PollingPlaceId")
+
+head(votes_pps_tcp)
+```
+
