@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ausvotesfeed)
 library(dplyr)
+library(tidyr)
 ```
 
 This is a walk-through of a post-election workflow of accessing results from the AEC's Virtual Tally Room (VTR) media feed based around `ausvotesfeed`.
@@ -114,5 +115,5 @@ mf_votes <- get_mediafeed_preload_votes_type(preload_xml)
 ```{r download_results}
 results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, 
                                                           Filetype = "Verbose",
-                                                          Archive = TRUE))
+                                                          Archive = FALSE))
 ```

@@ -16,6 +16,7 @@ Suggests:
     knitr,
     plumber,
     rmarkdown,
-    dplyr
+    dplyr,
+    tidyr
 RoxygenNote: 7.2.0
 VignetteBuilder: knitr
