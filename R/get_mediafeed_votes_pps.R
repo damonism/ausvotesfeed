@@ -20,12 +20,13 @@
 #'
 #' \item{\code{\link{get_mediafeed_votes_pps_fp}}}{Get first preference votes by polling place}
 #'
+#' \item{\code{\link{get_mediafeed_votes_pps_tcp}}}{Get two-candidate preferred votes by polling place}
+#'
+#' \item{\code{\link{get_mediafeed_votes_pps_total}}}{Get total votes by polling place}
+#'
 #' }
 #'
-#'
-#'
 #' @name get_mediafeed_votes_pps
-#'
 NULL
 
 
@@ -142,10 +143,16 @@ get_mediafeed_votes_pps_fp <- function(xml) {
 #'
 #' @param xml A pointer to an XML media feed object
 #'
-#' @return
+#' @return A \code{data.frame} with the following variables:
+#'   \code{PollingPlaceId}, \code{CandidateId}, \code{TCP.Historic},
+#'   \code{TCP.Percentage}, \code{TCP.Swing}, \code{TCP.Votes}.
 #' @export
 #'
 #' @examples
+#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_votes_pps_tcp(xml)
+#'
+#' @importFrom xml2 xml_find_all xml_name xml_attr xml_attrs
 get_mediafeed_votes_pps_tcp <- function(xml) {
   # This is almost exactly the same as get_mediafeed_votes_by_pps_fp()
 
@@ -170,7 +177,7 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
   }
 
   tcp_pps_df <- data.frame(tcp_pps_df,
-                           CandidateID = tmp_cand_ids,
+                           CandidateId = tmp_cand_ids,
                            stringsAsFactors = FALSE)
   # Get the votes
   message("Fetching votes: Historic votes... ", appendLF = FALSE)
@@ -207,7 +214,7 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
   } else {
 
     # Columns that should be integers
-    tmp_list_ints <- c("PollingPlaceId", "CandidateID", "TCP.Votes", "TCP.Historic")
+    tmp_list_ints <- c("PollingPlaceId", "CandidateId", "TCP.Votes", "TCP.Historic")
     # Columns that should be numeric
     tmp_list_num <- c("TCP.Percentage", "TCP.Swing")
 
@@ -227,10 +234,17 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
 #'
 #' @param xml A pointer to an XML media feed object
 #'
-#' @return
+#' @return A \code{data.frame} with six variables: \code{PollingPlaceId},
+#'   \code{VoteTpe} (one of either \code{Formal}, \code{Informal} or
+#'   \code{Total}), \code{Historic}, \code{Percentage}, \code{Swing} and
+#'   \code{Votes}.
 #' @export
 #'
 #' @examples
+#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_votes_pps_total(xml)
+#'
+#' @importFrom xml2 xml_find_all xml_name xml_attr xml_attrs
 get_mediafeed_votes_pps_total <- function(xml) {
   # This is almost exactly the same as get_mediafeed_fp_by_pps()
 

@@ -19,14 +19,17 @@ The functions included in this family are:
 
 \itemize{
 
-\item{\code{\link{get_mediafeed_preload_parties}}}{Get parties from preload
-media feed file}
+\item{\code{\link{get_mediafeed_preload_partygroups}}}{Get party groups from
+preload media feed file}
 
 \item{\code{\link{get_mediafeed_preload_candidates}}}{Get candidates from
 preload media feed file}
 
 \item{\code{\link{get_mediafeed_preload_pps}}}{Get polling places from
 preload media feed file}
+
+\item{\code{\link{get_mediafeed_preload_pps_cand}}}{Get candidates and
+polling places from preload media feed}
 
 \item{\code{\link{get_mediafeed_preload_divs}}}{Get divisions from preload
 media feed file}

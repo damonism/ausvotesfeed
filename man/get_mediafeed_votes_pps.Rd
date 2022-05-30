@@ -42,6 +42,10 @@ The functions in this family are:
 
 \item{\code{\link{get_mediafeed_votes_pps_fp}}}{Get first preference votes by polling place}
 
+\item{\code{\link{get_mediafeed_votes_pps_tcp}}}{Get two-candidate preferred votes by polling place}
+
+\item{\code{\link{get_mediafeed_votes_pps_total}}}{Get total votes by polling place}
+
 }
 
 Note: The different vote types are \code{Candidate} (normal candidate votes),

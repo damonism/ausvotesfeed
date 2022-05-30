@@ -9,6 +9,17 @@ get_mediafeed_votes_pps_total(xml)
 \arguments{
 \item{xml}{A pointer to an XML media feed object}
 }
+\value{
+A \code{data.frame} with six variables: \code{PollingPlaceId},
+  \code{VoteTpe} (one of either \code{Formal}, \code{Informal} or
+  \code{Total}), \code{Historic}, \code{Percentage}, \code{Swing} and
+  \code{Votes}.
+}
 \description{
 Get total votes by polling place
+}
+\examples{
+xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+get_mediafeed_votes_pps_total(xml)
+
 }

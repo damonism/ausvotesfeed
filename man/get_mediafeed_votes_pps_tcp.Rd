@@ -9,6 +9,16 @@ get_mediafeed_votes_pps_tcp(xml)
 \arguments{
 \item{xml}{A pointer to an XML media feed object}
 }
+\value{
+A \code{data.frame} with the following variables:
+  \code{PollingPlaceId}, \code{CandidateId}, \code{TCP.Historic},
+  \code{TCP.Percentage}, \code{TCP.Swing}, \code{TCP.Votes}.
+}
 \description{
 Get two-candidate preferred votes by polling place
+}
+\examples{
+xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+get_mediafeed_votes_pps_tcp(xml)
+
 }
