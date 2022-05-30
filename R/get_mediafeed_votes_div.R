@@ -129,3 +129,51 @@ get_mediafeed_votes_div_fp <- function(xml) {
   return(tmp_df)
 
 }
+
+get_mediafeed_votes_div2 <- function(xml) {
+  # Apparently I wrote this function twice.
+
+  tmp_nodes <- xml_find_all(xml, paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier",
+                                       "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Candidate/eml:CandidateIdentifier",
+                                       "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Ghost/eml:CandidateIdentifier",
+                                       sep = "|"))
+
+  tmp_type <- xml_name(tmp_nodes)
+  tmp_id <- xml_attr(tmp_nodes, "Id")
+  tmp_div_code <- xml_attr(tmp_nodes, "ShortCode")
+  # tmp_ind <- xml_attr(tmp_nodes, "Independent")
+
+  tmp_df <- data.frame(tmp_type,
+                       DivisionShortCode = tmp_div_code,
+                       CandidateId = tmp_id,
+                       stringsAsFactors = FALSE)
+
+  tmp_df$DivisionId <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$CandidateId, NA)
+  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df$DivisionShortCode <- Fill(tmp_df$DivisionShortCode)
+  tmp_df <- tmp_df[tmp_df$tmp_type == "CandidateIdentifier",]
+
+  tmp_nodes_cand <- xml_find_all(xml, paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Candidate",
+                                            "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Ghost",
+                                            sep = "|"))
+
+  if(length(tmp_nodes_cand) != nrow(tmp_df)) {
+    stop("Candidates extract is not the same length as candidate and division table.")
+  }
+
+  tmp_cand_votes <- as.data.frame(do.call("rbind", xml_attrs(xml_find_first(tmp_nodes_cand, "d1:Votes"))))
+  tmp_cand_votes <- data.frame(tmp_cand_votes,
+                               Votes = xml_text(xml_find_first(tmp_nodes_cand, "d1:Votes")),
+                               stringsAsFactors = FALSE)
+
+  tmp_df <- data.frame(tmp_df, tmp_cand_votes, stringsAsFactors = FALSE)
+  tmp_cols_int <- c("CandidateId", "DivisionId", "Historic", "MatchedHistoric", "Votes")
+  tmp_cols_num <- c("Percentage", "Swing")
+
+  tmp_df[tmp_cols_int] <- sapply(tmp_df[tmp_cols_int], as.integer)
+  tmp_df[tmp_cols_num] <- sapply(tmp_df[tmp_cols_num], as.numeric)
+
+  tmp_df[c("DivisionId", "DivisionShortCode", "CandidateId",
+           "Historic", "MatchedHistoric", "Percentage", "Swing", "Votes")]
+}
+

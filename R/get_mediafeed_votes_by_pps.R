@@ -300,3 +300,35 @@ get_mediafeed_votes_pps_total <- function(xml) {
   return(tmp_df)
 
 }
+
+get_mediafeed_votes_pps2 <- function(xml){
+  # This was another attempt but it turns out it's much slower! Keeping for prosperity.
+
+  tmp_pps_nodes <- xml_find_all(xml, paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace/d1:PollingPlaceIdentifier",
+                                           "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace/d1:FirstPreferences/d1:Candidate",
+                                           "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace/d1:FirstPreferences/d1:Ghost",
+                                           sep = "|"))
+
+  tmp_df <- data.frame(CandidateType = xml_name(tmp_pps_nodes),
+                       PollingPlaceId = xml_attr(tmp_pps_nodes, "Id"),
+                       CandidateId = xml_attr(xml_find_first(tmp_pps_nodes, "eml:CandidateIdentifier"), "Id"),
+                       stringsAsFactors = FALSE)
+
+  tmp_df$PollingPlaceId <- Fill(tmp_df$PollingPlaceId)
+  tmp_df <- tmp_df[tmp_df$CandidateType != "PollingPlaceIdentifier",]
+
+  tmp_votes <- data.frame(as.data.frame(do.call("rbind", xml_attrs(xml_find_all(tmp_pps_nodes, "d1:Votes")))),
+                          Votes = xml_text(xml_find_all(tmp_pps_nodes, "d1:Votes")),
+                          stringsAsFactors = FALSE)
+
+  tmp_df <- data.frame(tmp_df, tmp_votes, stringsAsFactors = FALSE)
+  tmp_df$IsGhost <- ifelse(tmp_df$CandidateType == "Ghost", TRUE, FALSE)
+  tmp_cols_int <- c("PollingPlaceId", "CandidateId", "Historic", "Votes")
+  tmp_cols_num <- c("Percentage", "Swing")
+  tmp_df[tmp_cols_int] <- sapply(tmp_df[tmp_cols_int], as.integer)
+  tmp_df[tmp_cols_num] <- sapply(tmp_df[tmp_cols_num], as.integer)
+
+  return(tmp_df[c("PollingPlaceId", "CandidateId", "CandidateType", "IsGhost",
+                  "Historic", "Percentage", "Swing", "Votes")])
+
+}
