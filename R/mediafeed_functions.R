@@ -362,3 +362,42 @@ get_mediafeed_votes_type <- function(xml, count = "fp") {
   return(tmp_df)
 }
 
+#' Fetch election results media feed
+#'
+#' Fetch the current media feed results xml for the nominated election.
+#'
+#' This is simply a shortcut for \code{\link{download_mediafeed_file}} and
+#' \code{\link{read_mediafeed_xml}}.
+#'
+#' @param election AEC EventIdentifier or election year
+#' @param api If \code{FALSE} (default), download the file from the AEC's FTP
+#'   site, otherwise, the URL "including port and trailing slash" of the server
+#'   running the media feed API.
+#' @param archive If true, use the media feed archive site, if \code{FALSE}
+#'   (default), use the live results media feed (only available during an
+#'   election).
+#'
+#' @return An XML media feed object
+#' @export
+#'
+#' @examples
+#' \dontrun{resuls_xml <- fetch_mediafeed_results(2022)}
+fetch_mediafeed_results <- function(election, api = FALSE, archive = FALSE) {
+
+  if(api != FALSE) {
+
+    tmp_file <- download_mediafeed_api(Server = api,
+                           EventIdentifier = election,
+                           Filetype = "Verbose",
+                           Archive = archive)
+
+  } else {
+
+    tmp_file <- download_mediafeed_file(EventIdentifier = election,
+                                        Filetype = "Verbose",
+                                        Archive = archive)
+  }
+
+  read_mediafeed_xml(tmp_file, filename = "results")
+
+}
