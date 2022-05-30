@@ -11,8 +11,9 @@ get_mediafeed_preload_pps(xml)
 }
 \value{
 A \code{data.frame} with five variables: \code{DivisionId},
-  \code{DivisionNm}, \code{DivisionShortCode}, \code{PollingPlaceId},
-  \code{PollingPlaceName} and \code{PollingPlaceClassification}.
+  \code{DivisionNm}, \code{DivisionShortCode}, \code{StateAb},
+  \code{PollingPlaceId}, \code{PollingPlaceName} and
+  \code{PollingPlaceClassification}.
 }
 \description{
 Get polling places and their associated divisions from the preload media feed
