@@ -100,8 +100,8 @@ get_mediafeed_preload_partygroups <- function(xml) {
 #' @param xml A pointer to an XML preload media feed object.
 #'
 #' @return A \code{data.frame} with five variables: \code{DivisionId},
-#'   \code{DivisionShortCode}, \code{PollingPlaceId}, \code{PollingPlaceName}
-#'   and \code{PollingPlaceClassification}.
+#'   \code{DivisionNm}, \code{DivisionShortCode}, \code{PollingPlaceId},
+#'   \code{PollingPlaceName} and \code{PollingPlaceClassification}.
 #' @export
 #'
 #' @examples
@@ -120,15 +120,16 @@ get_mediafeed_preload_pps <- function(xml) {
                                        sep = "|"))
   tmp_type <- xml_name(tmp_nodes)
   tmp_id <- xml_attr(tmp_nodes, "Id")
-  # Division short code was easier to get out of this query than name, so may as
-  # well keep it in the table for convenience sake.
   tmp_div_code <- xml_attr(tmp_nodes, "ShortCode")
+  # Slightly more complicated to get division name, but worth the extra effort.
+  tmp_div_name <- xml_text(xml_find_first(tmp_nodes, "../d1:PollingDistrictIdentifier/d1:Name"))
   tmp_pps_name <- xml_attr(tmp_nodes, "Name")
   tmp_pps_clas <- xml_attr(tmp_nodes, "Classification")
 
   tmp_df <- data.frame(tmp_type,
                        PollingPlaceId = tmp_id,
                        DivisionShortCode = tmp_div_code,
+                       DivisionNm = tmp_div_name,
                        PollingPlaceNm = tmp_pps_name,
                        PollingPlaceClassification = tmp_pps_clas,
                        stringsAsFactors = FALSE)
@@ -136,11 +137,12 @@ get_mediafeed_preload_pps <- function(xml) {
   tmp_df$DivisionId <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$PollingPlaceId, NA)
   tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
   tmp_df$DivisionShortCode <- Fill(tmp_df$DivisionShortCode)
+  tmp_df$DivisionNm <- Fill(tmp_df$DivisionNm)
   tmp_df <- tmp_df[tmp_df$tmp_type == "PollingPlaceIdentifier",]
 
   # tmp_df$tmp_type <- NULL
   tmp_df[c("DivisionId", "PollingPlaceId")] <- sapply(tmp_df[c("DivisionId", "PollingPlaceId")], as.integer)
-  tmp_df[c("DivisionId", "DivisionShortCode", "PollingPlaceId", "PollingPlaceNm", "PollingPlaceClassification")]
+  tmp_df[c("DivisionId", "DivisionNm", "DivisionShortCode", "PollingPlaceId", "PollingPlaceNm", "PollingPlaceClassification")]
 
 }
 
