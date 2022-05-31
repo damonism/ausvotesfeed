@@ -176,3 +176,34 @@ votes_pps_tcp <- votes_pps_tcp %>%
 head(votes_pps_tcp)
 ```
 
+Check how many seats we have a TCP leader for (it should be 151).
+
+```{r}
+get_mediafeed_votes_div(results_xml, "tcp") %>% 
+  filter(TCP.Percentage >= 50) %>% 
+  summarise(n = n())
+```
+
+
+Candidates newly elected to Parliament.
+
+```{r}
+get_mediafeed_votes_div(results_xml, "tcp") %>% 
+  left_join(mf_cand, by = c("CandidateId", "DivisionId")) %>% 
+  filter(TCP.Percentage >=50 & ElectedHistoric == FALSE) %>% 
+  select(StateAb, DivisionNm, CandidateNm, IsIndependent, PartyNm)
+```
+
+Seats that have changed hands.
+
+```{r}
+get_mediafeed_votes_div(results_xml, "tcp") %>% 
+  left_join(mf_cand, by = c("CandidateId", "DivisionId", "CandidateType")) %>% 
+  filter(TCP.Percentage >= 50 & ElectedHistoric == FALSE & (Incumbent == FALSE | IncumbentNotional == FALSE)) %>% 
+  select(StateAb, DivisionId, DivisionNm, CandidateNm, PartyCode, TCP.Percentage, TCP.Swing) %>% 
+  left_join(mf_cand %>% 
+              filter(Incumbent == TRUE | IncumbentNotional == TRUE) %>% 
+              select(DivisionId, Previous = PartyCode),
+            by = "DivisionId")
+```
+
