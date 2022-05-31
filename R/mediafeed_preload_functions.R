@@ -243,16 +243,19 @@ get_mediafeed_preload_candidates <- function(xml) {
   tmp_type <- xml_name(tmp_nodes)
   tmp_id <- xml_attr(tmp_nodes, "Id")
   tmp_div_code <- xml_attr(tmp_nodes, "ShortCode")
+  tmp_div_name <- xml_text(xml_find_first(tmp_nodes, "d1:Name"))
   # tmp_ind <- xml_attr(tmp_nodes, "Independent")
 
   tmp_df <- data.frame(tmp_type,
                        DivisionShortCode = tmp_div_code,
+                       DivisionNm = tmp_div_name,
                        CandidateId = tmp_id,
                        stringsAsFactors = FALSE)
 
   tmp_df$DivisionId <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$CandidateId, NA)
   tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
   tmp_df$DivisionShortCode <- Fill(tmp_df$DivisionShortCode)
+  tmp_df$DivisionNm <- Fill(tmp_df$DivisionNm)
   tmp_df <- tmp_df[tmp_df$tmp_type == "CandidateIdentifier",]
 
   tmp_nodes_cand <- xml_find_all(xml, paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Candidate",
@@ -300,7 +303,7 @@ get_mediafeed_preload_candidates <- function(xml) {
   tmp_cand_df <- cbind(tmp_cand_df, tmp_df)
 
   tmp_cols_logical <- c("Elected", "ElectedHistoric", "Incumbent", "IncumbentNotional", "IsIndependent")
-  tmp_cols_nochange <- c("CandidateType", "PartyCode", "PartyNm", "DivisionShortCode", "tmp_type", "CandidateNm")
+  tmp_cols_nochange <- c("CandidateType", "PartyCode", "PartyNm", "DivisionShortCode", "DivisionNm", "tmp_type", "CandidateNm")
   tmp_cols_num <- c("FP.Percentage", "FP.Swing")
   tmp_cols_int <- setdiff(colnames(tmp_cand_df), c(tmp_cols_logical, tmp_cols_nochange, tmp_cols_num))
 
@@ -317,7 +320,7 @@ get_mediafeed_preload_candidates <- function(xml) {
     stop("Candidate extract did not match Division extract.")
   }
 
-  tmp_cand_df[c("DivisionId", "DivisionShortCode",
+  tmp_cand_df[c("DivisionId", "DivisionShortCode", "DivisionNm",
                 "CandidateType", "IsGhost", "CandidateId", "CandidateNm",
                 "BallotPosition",
                 "IsIndependent", "PartyId", "PartyCode", "PartyNm",
