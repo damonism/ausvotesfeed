@@ -10,15 +10,15 @@ get_mediafeed_preload_candidates(xml)
 \item{xml}{A pointer to an XML preload media feed object}
 }
 \value{
-A \code{data.frame} with 21 variables: \code{DivisionId},
-  \code{DivisionShortCode}, \code{DivisionNm}, \code{CandidateType}
-  (\code{Candidate} or \code{Ghost}), \code{IsGhost} (\code{logical}),
-  \code{CandidateId}, \code{CandidateNm}, \code{BallotPosition},
-  \codde{IsIndependent} (\code{logical}), \code{PartyId}, \code{PartyCode},
-  \code{PartyNm}, \code{Elected} (\code{logical}), \code{ElectedHistoric}
-  (\code{logical}), \code{Incumbent} (\code{logical}),
-  \code{IncumbentNotional} (\code{logical}), \code{FP.Votes},
-  \code{FP.Percentage}, \code{FP.Swing}, \code{FP.Historic},
+A \code{data.frame} with 22 variables: \code{StateAb},
+  \code{DivisionId}, \code{DivisionShortCode}, \code{DivisionNm},
+  \code{CandidateType} (\code{Candidate} or \code{Ghost}), \code{IsGhost}
+  (\code{logical}), \code{CandidateId}, \code{CandidateNm},
+  \code{BallotPosition}, \code{IsIndependent} (\code{logical}),
+  \code{PartyId}, \code{PartyCode}, \code{PartyNm}, \code{Elected}
+  (\code{logical}), \code{ElectedHistoric} (\code{logical}), \code{Incumbent}
+  (\code{logical}), \code{IncumbentNotional} (\code{logical}),
+  \code{FP.Votes}, \code{FP.Percentage}, \code{FP.Swing}, \code{FP.Historic},
   \code{FP.MatchedHistoric}.
 }
 \description{
