@@ -184,10 +184,11 @@ get_mediafeed_votes_div(results_xml, "tcp") %>%
   summarise(n = n())
 ```
 
+### Results by candidate
 
 Candidates newly elected to Parliament.
 
-```{r}
+```{r newly_elected}
 get_mediafeed_votes_div(results_xml, "tcp") %>% 
   left_join(mf_cand, by = c("CandidateId", "DivisionId")) %>% 
   filter(TCP.Percentage >=50 & ElectedHistoric == FALSE) %>% 
@@ -196,7 +197,7 @@ get_mediafeed_votes_div(results_xml, "tcp") %>%
 
 Seats that have changed hands.
 
-```{r}
+```{r changed_hands}
 get_mediafeed_votes_div(results_xml, "tcp") %>% 
   left_join(mf_cand, by = c("CandidateId", "DivisionId", "CandidateType")) %>% 
   filter(TCP.Percentage >= 50 & ElectedHistoric == FALSE & (Incumbent == FALSE | IncumbentNotional == FALSE)) %>% 
@@ -205,5 +206,36 @@ get_mediafeed_votes_div(results_xml, "tcp") %>%
               filter(Incumbent == TRUE | IncumbentNotional == TRUE) %>% 
               select(DivisionId, Previous = PartyCode),
             by = "DivisionId")
+```
+
+### Gender and parliament
+
+Find out the gender distribution by party for the incoming parliament (based on TCP leading candidate).
+
+```{r gender}
+get_mediafeed_votes_div(results_xml, "tcp") %>% 
+  left_join(mf_cand, by = c("DivisionId", "CandidateId", "CandidateType")) %>% 
+  filter(TCP.Percentage > 50) %>% 
+  mutate(PartyCode = ifelse(IsIndependent == TRUE, "Independent", PartyCode)) %>% 
+  group_by(PartyCode, Gender) %>% 
+  summarise(n = n()) %>% 
+  pivot_wider(names_from = Gender, values_from = n, values_fill = 0)
+```
+
+### Close seats
+
+Return divisions ordered by the closest TCP margin.
+
+```{r tcp_margin}
+get_mediafeed_votes_div(results_xml, "tcp") %>% 
+  select(-TCP.Historic, 
+         -TCP.MatchedHistoric, 
+         -TCP.MatchedHistoricFirstPrefsIn, 
+         -CandidateType) %>% 
+  arrange(DivisionId, desc(TCP.Percentage)) %>% 
+  group_by(DivisionId) %>%
+  mutate(TCP.Margin = TCP.Votes - lead(TCP.Votes)) %>% 
+  filter(TCP.Percentage > 50) %>% 
+  arrange(TCP.Margin)
 ```
 
