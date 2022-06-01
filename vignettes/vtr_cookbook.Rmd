@@ -1,0 +1,40 @@
+---
+title: "VTR Cookbook"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{VTR Cookbook}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ausvotesfeed)
+library(dplyr)
+library(tidyr)
+```
+
+## Declaration vote count progress
+
+Compare the number of issued and number of counted declaration votes to determine the vote count. Note that these files are only available during an election period, and have no equivalent on the archive VTR.
+
+```{r}
+# Declaration vote progress
+download_file_vtr("GeneralDecVotesIssuedByDivisionDownload", 2022, basedir = "https://tallyroom.aec.gov.au/Downloads/") %>% 
+  pivot_longer(Provisional:PostalOwnDivision, names_to = "Type", values_to = "Votes.Issued") %>% 
+  left_join(download_file_vtr("GeneralDecVotesReceivedByDivisionDownload", 2022, basedir = "https://tallyroom.aec.gov.au/Downloads/") %>% 
+              pivot_longer(Provisional:PostalOwnDivision, names_to = "Type", values_to = "Votes.Processed"),
+            by = c("DivisionID", "DivisionNm", "StateAb", "Type")) %>% 
+  group_by(Type) %>% 
+  summarise(Votes.Issued = sum(Votes.Issued, na.rm = TRUE),
+            Votes.Processed = sum(Votes.Processed, na.rm = TRUE),
+            Outstanding = sum(Votes.Issued, na.rm = TRUE) - sum(Votes.Processed, na.rm = TRUE),
+            Complete = sum(Votes.Processed, na.rm = TRUE) / sum(Votes.Issued, na.rm = TRUE) * 100)
+```
+
