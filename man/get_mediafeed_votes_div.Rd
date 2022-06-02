@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_mediafeed_votes_div.R
 \name{get_mediafeed_votes_div}
 \alias{get_mediafeed_votes_div}
-\title{Get votes by polling place}
+\title{Get votes by division}
 \usage{
 get_mediafeed_votes_div(xml, type)
 }
@@ -10,7 +10,8 @@ get_mediafeed_votes_div(xml, type)
 \item{xml}{A pointer to an XML media feed object}
 
 \item{type}{One of either \code{fp} (first preference), \code{tcp}
-(two-candidate preferred) or \code{tpp} (two party preferred).}
+(two-candidate preferred), \code{tpp} (two party preferred) or \code{total}
+(total first preference votes).}
 }
 \value{
 A \code{data.frame} with a \code{DivisionId} column and at least
@@ -18,7 +19,8 @@ A \code{data.frame} with a \code{DivisionId} column and at least
 }
 \description{
 Generic function for downloading various vote types (first preference,
-two-candidate preferred or two-party preferred) by polling place.
+two-candidate preferred, two-party preferred or total votes) by polling
+place.
 }
 \details{
 Note that this iteration of this function does not have any real error
