@@ -526,3 +526,66 @@ get_mediafeed_preload_gender <- function(xml, chamber) {
   return(tmp_df)
 
 }
+
+#' Get Senate candidates from preload media feed file
+#'
+#' @param xml A pointer to an XML preload media feed object.
+#'
+#' @return A \code{data.frame}.
+#' @export
+#'
+#' @importFrom xml2 xml_find_all xml_name xml_text xml_attr xml_find_first
+get_mediafeed_preload_candidates_sen <- function(xml) {
+  tmp_nodes <- xml_find_all(xml, paste("/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/eml:ContestIdentifier",
+                                               "/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Group/d1:GroupIdentifier",
+                                               "/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Group/d1:Candidate",
+                                               "/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Group/d1:TicketVotes",
+                                               "/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Group/d1:Unapportioned",
+                                               "/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/d1:FirstPreferences/d1:UngroupedCandidate",
+                                               sep = "|"))
+
+  tmp_df <- data.frame(CandidateType = xml_name(tmp_nodes),
+                       id = xml_attr(tmp_nodes, "Id"),
+                       Ticket = xml_text(xml_find_first(tmp_nodes, "d1:Ticket")),
+                       GroupNm = xml_text(xml_find_first(tmp_nodes, "d1:GroupName")),
+                       CandidateId = xml_attr(xml_find_first(tmp_nodes, "eml:CandidateIdentifier"), "Id"),
+                       CandidateNm = xml_text(xml_find_first(tmp_nodes, "eml:CandidateIdentifier/eml:CandidateName")),
+                       PartyId = xml_attr(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier"), "Id"),
+                       PartyAb = xml_attr(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier"), "ShortCode"),
+                       PartyNm = xml_text(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier/eml:RegisteredName")),
+                       IsIndependent = xml_attr(tmp_nodes, "Independent"),
+                       BallotPosition = xml_text(xml_find_first(tmp_nodes, "d1:BallotPosition")),
+                       Elected = xml_text(xml_find_first(tmp_nodes, "d1:Elected")),
+                       ElectedHistoric = xml_attr(xml_find_first(tmp_nodes, "d1:Elected"), "Historic"),
+                       Incumbent = xml_text(xml_find_first(tmp_nodes, "d1:Incumbent")),
+                       Historic = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Historic"),
+                       Percentage = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Percentage"),
+                       Swing = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Swing"),
+                       QuotaProportion = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "QuotaProportion"),
+                       Votes = xml_text(xml_find_first(tmp_nodes, "d1:Votes")),
+                       stringsAsFactors = FALSE)
+
+  tmp_df$StateAb <- ifelse(tmp_df$CandidateType == "ContestIdentifier", tmp_df$id, NA)
+  tmp_df$StateAb <- Fill(tmp_df$StateAb)
+  tmp_df$GroupId <- ifelse(tmp_df$CandidateType == "GroupIdentifier", tmp_df$id, NA)
+  tmp_df$GroupId[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupId[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
+  tmp_df$Ticket[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$Ticket[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
+  tmp_df$GroupNm[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupNm[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
+  tmp_df <- tmp_df[!tmp_df$CandidateType %in% c("ContestIdentifier", "GroupIdentifier", "TicketVotes", "Unapportioned"),]
+
+  tmp_col_num <- c("GroupId", "CandidateId", "PartyId", "BallotPosition", "Historic", "Votes")
+  tmp_df[tmp_col_num] <- sapply(tmp_df[tmp_col_num], as.integer)
+  tmp_df[c("Percentage", "Swing", "QuotaProportion")] <- sapply(tmp_df[c("Percentage", "Swing", "QuotaProportion")], as.numeric)
+  tmp_df$IsIndependent <- ifelse(is.na(tmp_df$IsIndependent), FALSE,
+                                 ifelse(tmp_df$IsIndependent == "true", TRUE, FALSE))
+  tmp_df[c("Elected", "ElectedHistoric", "Incumbent")] <- lapply(tmp_df[c("Elected", "ElectedHistoric", "Incumbent")],
+                                                                 function(x) ifelse(x == "true", TRUE, FALSE))
+
+  tmp_df[c("StateAb", "CandidateType",
+           "Ticket", "GroupId", "GroupNm",
+           "CandidateId", "CandidateNm",
+           "PartyId", "PartyAb", "PartyNm", "IsIndependent",
+           "BallotPosition", "Elected", "ElectedHistoric", "Incumbent",
+           "Historic", "Percentage", "Swing", "QuotaProportion", "Votes")]
+
+}
