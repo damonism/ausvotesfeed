@@ -62,7 +62,7 @@ get_mediafeed_senate_div <- function(xml) {
   tmp_df <- tmp_df[c("StateAb", "CandidateType", "Ticket", "GroupId", "CandidateId", "PartyId", "PartyAb", "IsIndependent", "Historic", "Percentage", "Swing", "QuotaProportion", "Votes")]
 
   tmp_df[c("GroupId", "CandidateId", "PartyId", "Historic", "Votes")] <- sapply(tmp_df[c("GroupId", "CandidateId", "PartyId", "Historic", "Votes")], as.integer)
-  tmp_df[c("Percentage", "Swing")] <- sapply(tmp_df[c("Percentage", "Swing")], as.numeric)
+  tmp_df[c("Percentage", "Swing", "QuotaProportion")] <- sapply(tmp_df[c("Percentage", "Swing", "QuotaProportion")], as.numeric)
   tmp_df$IsIndependent <- ifelse(is.na(tmp_df$IsIndependent), FALSE,
                                  ifelse(tmp_df$IsIndependent == "true", TRUE, FALSE))
 
