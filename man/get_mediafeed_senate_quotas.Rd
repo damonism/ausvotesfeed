@@ -10,8 +10,28 @@ get_mediafeed_senate_quotas(xml)
 \item{xml}{A pointer to an XML media feed object.}
 }
 \value{
-A \code{data.frame}.
+A \code{data.frame} with four variables: \code{StateAb},
+  \code{Quota}, \code{QuotaProvisional} (\code{logical}) and
+  \code{NumberOfPositions}.
 }
 \description{
-Get Senate quotas by state
+Get AEC calculated Senate quotes and vacancies by jurisdiction from the media
+feed file.
+}
+\details{
+This returns the current quota and number of vacancies from the media feed
+file for the Senate elections.
+
+Note that if you are planning on using \code{\link{get_mediafeed_votes_sen}}
+that provides the votes as quotas through the \code{QuotaProportion}
+variable.
+
+This can also be used on the preload XML file, although it will return all of
+the \code{Quota} variables as 1. This is mostly useful for functions that
+need the \code{NumberOfPositions} variables.
+}
+\examples{
+results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+get_mediafeed_senate_quotas(results_xml)
+
 }

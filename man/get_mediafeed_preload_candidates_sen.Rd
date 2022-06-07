@@ -10,8 +10,45 @@ get_mediafeed_preload_candidates_sen(xml)
 \item{xml}{A pointer to an XML preload media feed object.}
 }
 \value{
-A \code{data.frame}.
+A \code{data.frame} with 20 variables: \code{StateAb},
+  \code{CandidateType} (either \code{Candidate} or
+  \code{UngroupedCandidate}), \code{Ticket}, \code{GroupId}, \code{GroupNm},
+  \code{CandidateId}, \code{CandidateNm}, \code{PartyId}, \code{PartyAb},
+  \code{PartyNm}, \code{IsIndepenendent} (\code{logical}),
+  \code{BallotPosition}, \code{Elected} (\code{logical}),
+  \code{HistoricElected} (\code{logical}), \code{Incumbent} (\code{logical}),
+  \code{Historic} (votes), \code{Percentage}, \code{Swing},
+  \code{QuotaProportion} and \code{Votes}.
 }
 \description{
-Get Senate candidates from preload media feed file
+Extract information on Senate candidates from the media feed preload file.
+}
+\details{
+This is the only Senate-specific preload function because most of the other
+details about the Senate election (such as polling places) are available from
+the standard preload functions (and the media feed does not seem to have
+results by polling place for the Senate) any way.
+
+Note that there are some details of the Senate results from the media feed
+that are not replicated here: specifically the group rows and the
+unapportioned rows. According to the
+\href{https://www.aec.gov.au/footer/glossary.htm#u}{AEC's definitions},
+unapportioned votes are "are votes that have been allocated to a party or
+group by one count but have not yet been allocated to individual candidates
+within that party or group. As the counting progresses, these votes will be
+distributed to the individual candidates."
+
+Note also that there is a distinction between the \code{GroupNm} and the
+\code{PartyNm}. The \code{GroupNm} is the name of the group under the
+above-the-line box, and it may be the same as the \code{PartyNm} of the
+candidates in the group, or it may be different (the Coalition tends to run
+tickets with both LP and NP candidates, for example, so the members of the
+group will have different \code{PartyNm} and \code{PartyAb} values from one
+another).
+}
+\examples{
+preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,  "Preload", Archive = TRUE),
+                                  "results")
+get_mediafeed_preload_candidates_sen(preload_xml)
+
 }

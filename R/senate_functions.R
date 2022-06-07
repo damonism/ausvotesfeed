@@ -1,9 +1,29 @@
 #' Get Senate quotas by state
 #'
+#' Get AEC calculated Senate quotes and vacancies by jurisdiction from the media
+#' feed file.
+#'
+#' This returns the current quota and number of vacancies from the media feed
+#' file for the Senate elections.
+#'
+#' Note that if you are planning on using \code{\link{get_mediafeed_votes_sen}}
+#' that provides the votes as quotas through the \code{QuotaProportion}
+#' variable.
+#'
+#' This can also be used on the preload XML file, although it will return all of
+#' the \code{Quota} variables as 1. This is mostly useful for functions that
+#' need the \code{NumberOfPositions} variables.
+#'
 #' @param xml A pointer to an XML media feed object.
 #'
-#' @return A \code{data.frame}.
+#' @return A \code{data.frame} with four variables: \code{StateAb},
+#'   \code{Quota}, \code{QuotaProvisional} (\code{logical}) and
+#'   \code{NumberOfPositions}.
 #' @export
+#'
+#' @examples
+#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_senate_quotas(results_xml)
 #'
 #' @importFrom xml2 xml_find_all xml_attr xml_text
 get_mediafeed_senate_quotas <- function(xml) {
@@ -21,15 +41,56 @@ get_mediafeed_senate_quotas <- function(xml) {
 
 }
 
-#' Get Senate votes by division
+#' Get Senate votes by state
+#'
+#' Get the Senate first preference votes from the media feed XML file by state
+#' and territory.
+#'
+#' Similar to the equivalent House functions, this function attempts to return a
+#' relatively minimalist table of results that is designed to be merged with the
+#' output of \code{\link{get_mediafeed_preload_candidates_sen}}.
+#'
+#' There are three possible values for \code{CandidateType}:
+#'
+#' \itemize{
+#'
+#' \item{\code{Candidate}}{A candidate in a group}
+#'
+#' \item{\code{TicketVotes}}{The total number of votes above the line for that
+#' group}
+#'
+#' \item{\code{Unapportioned}}{According to the
+#' \href{https://www.aec.gov.au/footer/glossary.htm#u}{AEC's definitions},
+#' unapportioned votes are "are votes that have been allocated to a party or
+#' group by one count but have not yet been allocated to individual candidates
+#' within that party or group. As the counting progresses, these votes will be
+#' distributed to the individual candidates."}
+#'
+#' \item{\code{UngroupedCandidate}}{A candidate not in a Senate group (that is,
+#' without a box above the line).}
+#'
+#' }
+#'
+#' The media feed also provides a \code{GroupTotal} result, but for the sake of
+#' convenience that is not included in the output of this function because it
+#' would require filtering out before aggregating votes.
 #'
 #' @param xml A pointer to an XML media feed object.
 #'
-#' @return A \code{data.frame}.
+#' @return A \code{data.frame} with 13 variables: \code{StateAb},
+#'   \code{CandidateType} (can be one of either \code{Candidate},
+#'   \code{TicketVotes}, \code{Unapportioned} or \code{UngroupedCandidate}),
+#'   \code{Ticket}, \code{GroupId}, \code{CandidateId}, \code{PartyId},
+#'   \code{IsIndependent}, \code{Historic} (votes), \code{Percentage},
+#'   \code{Swing}, \code{QuotaProportion} and \code{Votes}.
 #' @export
 #'
+#' @examples
+#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_senate_quotas(results_xml)
+#'
 #' @importFrom xml2 xml_find_all xml_attr xml_name xml_text
-get_mediafeed_senate_div <- function(xml) {
+get_mediafeed_votes_sen <- function(xml) {
 
   tmp_nodes <- xml_find_all(xml, paste("/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/eml:ContestIdentifier",
                                        "/d1:MediaFeed/d1:Results/d1:Election/d1:Senate/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Group/d1:GroupIdentifier",
