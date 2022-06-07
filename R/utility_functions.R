@@ -244,7 +244,7 @@ read_mediafeed_xml <- function(path, filename = NA) {
 #'
 #' @examples
 #' \dontrun{
-#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 #' get_mediafeed_metadata(results_xml)}
 #'
 #' @importFrom xml2 xml_attrs xml_find_first

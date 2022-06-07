@@ -37,6 +37,6 @@ have already got this from the preload file.
 }
 \examples{
 \dontrun{
-results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_fp_by_pps(results_xml)}
 }

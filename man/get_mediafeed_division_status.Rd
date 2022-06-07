@@ -21,7 +21,7 @@ single-row \code{data.frame}.
 \examples{
 \dontrun{
 library(purrr)
-xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 map_dfr(get_mediafeed_divisionids(xml), get_mediafeed_division_status, xml)
 }
 

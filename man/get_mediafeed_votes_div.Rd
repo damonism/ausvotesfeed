@@ -30,7 +30,7 @@ conversions in the function are hardcoded and may fail.
 }
 \examples{
 \dontrun{
-results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_votes_div(results_xml, "fp")}
 
 }

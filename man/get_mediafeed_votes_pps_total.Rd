@@ -19,7 +19,7 @@ A \code{data.frame} with six variables: \code{PollingPlaceId},
 Get total votes by polling place
 }
 \examples{
-xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_votes_pps_total(xml)
 
 }

@@ -17,7 +17,7 @@ List House division IDs from media feed file.
 }
 \examples{
 \dontrun{
-xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 get_mediafeed_divisionids(xml)
 }
 }

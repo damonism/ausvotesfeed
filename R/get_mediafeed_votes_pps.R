@@ -60,7 +60,7 @@ NULL
 #'
 #' @examples
 #' \dontrun{
-#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_votes_by_pps_fp(xml)}
 #'
 #' @importFrom xml2 xml_find_all xml_name xml_attr xml_attrs
@@ -149,7 +149,7 @@ get_mediafeed_votes_pps_fp <- function(xml) {
 #' @export
 #'
 #' @examples
-#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_votes_pps_tcp(xml)
 #'
 #' @importFrom xml2 xml_find_all xml_name xml_attr xml_attrs
@@ -241,7 +241,7 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
 #' @export
 #'
 #' @examples
-#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_votes_pps_total(xml)
 #'
 #' @importFrom xml2 xml_find_all xml_name xml_attr xml_attrs

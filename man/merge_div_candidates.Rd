@@ -30,12 +30,15 @@ In practice, this is a much more useful function for analysis of results than
 \code{\link{get_mediafeed_votes_div}} by itself.
 }
 \examples{
-\dontrun{ preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-"Preload", Archive = TRUE), "results") mf_cand <-
-get_mediafeed_preload_candidates(preload_xml)
+\dontrun{
+preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
+                                  "results")
 
-results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive
-= TRUE)) merge_div_candidates(mf_cand, results_xml, "fp")}
+mf_cand <- get_mediafeed_preload_candidates(preload_xml)
+
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
+
+merge_div_candidates(mf_cand, results_xml, "fp")}
 
 }
 \seealso{

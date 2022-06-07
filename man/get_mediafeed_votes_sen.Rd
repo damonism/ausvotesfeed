@@ -52,7 +52,7 @@ convenience that is not included in the output of this function because it
 would require filtering out before aggregating votes.
 }
 \examples{
-results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_senate_quotas(results_xml)
 
 }

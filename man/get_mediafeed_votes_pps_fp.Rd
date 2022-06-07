@@ -37,7 +37,7 @@ true.
 }
 \examples{
 \dontrun{
-xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_votes_by_pps_fp(xml)}
 
 }

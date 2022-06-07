@@ -31,7 +31,7 @@ the \code{Quota} variables as 1. This is mostly useful for functions that
 need the \code{NumberOfPositions} variables.
 }
 \examples{
-results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_senate_quotas(results_xml)
 
 }

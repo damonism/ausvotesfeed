@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_senate_quotas(results_xml)
 #'
 #' @importFrom xml2 xml_find_all xml_attr xml_text
@@ -86,7 +86,7 @@ get_mediafeed_senate_quotas <- function(xml) {
 #' @export
 #'
 #' @examples
-#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_senate_quotas(results_xml)
 #'
 #' @importFrom xml2 xml_find_all xml_attr xml_name xml_text

@@ -15,7 +15,7 @@ NULL
 #'
 #' @examples
 #' \dontrun{
-#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 #' get_mediafeed_divisionids(xml)
 #' }
 get_mediafeed_divisionids <- function(xml) {
@@ -38,7 +38,7 @@ get_mediafeed_divisionids <- function(xml) {
 #' @examples
 #' \dontrun{
 #' library(purrr)
-#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 #' map_dfr(get_mediafeed_divisionids(xml), get_mediafeed_division_status, xml)
 #' }
 #'
@@ -108,7 +108,7 @@ get_mediafeed_division_status <- function(DivisionID, xml) {
 #'
 #' @examples
 #' \dontrun{
-#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_fp_by_pps(results_xml)}
 get_mediafeed_candidates <- function(xml, party = FALSE) {
 
@@ -192,12 +192,15 @@ get_mediafeed_candidates <- function(xml, party = FALSE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{ preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
-#' "Preload", Archive = TRUE), "results") mf_cand <-
-#' get_mediafeed_preload_candidates(preload_xml)
+#' \dontrun{
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
+#'                                   "results")
 #'
-#' results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive
-#' = TRUE)) merge_div_candidates(mf_cand, results_xml, "fp")}
+#' mf_cand <- get_mediafeed_preload_candidates(preload_xml)
+#'
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#'
+#' merge_div_candidates(mf_cand, results_xml, "fp")}
 #'
 #' @seealso \code{\link{get_mediafeed_votes_div}} for the details of the
 #'   function that actually fetches the results.
@@ -284,7 +287,7 @@ merge_div_candidates <- function(preload_cand, xml, type) {
 #' @examples
 #' \dontrun{
 #' library(purrr)
-#' xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+#' xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 #' map_dfr(get_mediafeed_divisionids(xml), get_mediafeed_votes_pps, xml)
 #' }
 get_mediafeed_votes_pps <- function(DivisionID, xml) {
@@ -370,6 +373,7 @@ get_mediafeed_votes_pps <- function(DivisionID, xml) {
 #' \dontrun{
 #' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 #' get_mediafeed_votes_type(results_xml, count = "fp")}
+#'
 #' @importFrom xml2 xml_find_all xml_attr xml_attrs xml_name xml_text
 get_mediafeed_votes_type <- function(xml, count = "fp") {
   # NOTE: I think this is the most efficient strategy to get the results data

@@ -42,4 +42,5 @@ should probably be pivoted into a \code{tidyr} "long" format.
 \dontrun{
 results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
 get_mediafeed_votes_type(results_xml, count = "fp")}
+
 }

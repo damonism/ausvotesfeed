@@ -31,7 +31,7 @@ The time stamp returned in \code{Created} can be converted with
 }
 \examples{
 \dontrun{
-results_xml <- read_mediafeed_xml(get_mediafeed_file(2022, "Verbose", Archive = FALSE))
+results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = FALSE))
 get_mediafeed_metadata(results_xml)}
 
 }
