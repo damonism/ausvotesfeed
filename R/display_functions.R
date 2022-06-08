@@ -1,3 +1,41 @@
+#' Display current election results
+#'
+#' Return a list of election results tables with current results suitable for
+#' displaying in an application or function.
+#'
+#' @param xml A pointer to an XML media feed object.
+#' @param preload_candidates A \code{data.frame} of candidate details obtained
+#'   from \code{\link{get_mediafeed_preload_candidates}}.
+#'
+#' @return A list with tables for each division. Note that the names of each of
+#'   the division results list items are the division ids as a character string.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Preload", Archive = TRUE),
+#'                                   "results")
+#'
+#' mf_cand <- get_mediafeed_preload_candidates(preload_xml)
+#'
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' mediafeed_display(results_xml, mf_cand)}
+mediafeed_display <- function(xml, preload_candidates) {
+
+  tmp_fp <- mediafeed_display_fp(xml, preload_candidates)
+  tmp_tcp <- mediafeed_display_tcp(xml, preload_candidates)
+
+  tmp_divs <- unique(tmp_fp[c("DivisionId", "DivisionNm")])
+
+  tmp_display <- lapply(tmp_divs$DivisionId,
+                        function(x) list(fp = tmp_fp[tmp_fp$DivisionId == x, ], tcp = tmp_tcp[tmp_tcp$DivisionId == x, ]))
+  names(tmp_display) <- tmp_divs$DivisionId
+
+  tmp_display <- list(tmp_display, Metadata = list(get_mediafeed_metadata(xml)))
+
+  return(tmp_display)
+}
+
 
 mediafeed_display_tcp <- function(xml, preload_candidates) {
   tmp_div_tcp <- get_mediafeed_votes_div(xml, "tcp")
