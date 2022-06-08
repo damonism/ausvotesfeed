@@ -165,7 +165,7 @@ results_xml <- read_mediafeed_xml(download_mediafeed_file(2022,
 Another way to do this if you just want to quickly get the results of the current election is:
 
 ```{r eval=FALSE, include=FALSE}
-results_xml <- fetch_mediafeed_results(2020)
+results_xml <- fetch_mediafeed_results(2022)
 ```
 
 ### Results by polling place
