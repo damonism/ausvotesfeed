@@ -18,3 +18,4 @@ A vector or \code{data.frame} column.
 \description{
 Internal convenience fill down function to avoid including all of \code{tidyr}.
 }
+\keyword{internal}

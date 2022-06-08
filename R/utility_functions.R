@@ -274,6 +274,8 @@ get_mediafeed_metadata <- function(xml, short = TRUE) {
 #'
 #' @return A vector or \code{data.frame} column.
 #'
+#' @keywords internal
+#'
 #' @source \url{https://stackoverflow.com/questions/9514504/add-missing-value-in-column-with-value-from-row-above}
 Fill <- function(x)
 {
