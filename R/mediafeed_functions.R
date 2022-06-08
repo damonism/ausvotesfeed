@@ -456,7 +456,7 @@ get_mediafeed_votes_type <- function(xml, count = "fp") {
 #'   (default), use the live results media feed (only available during an
 #'   election).
 #'
-#' @return An XML media feed object
+#' @return An XML media feed object.
 #' @export
 #'
 #' @examples
@@ -478,5 +478,91 @@ fetch_mediafeed_results <- function(election, api = FALSE, archive = FALSE) {
   }
 
   read_mediafeed_xml(tmp_file, filename = "results")
+
+}
+
+#' Get national media feed analysis
+#'
+#' Get the AEC's aggregate results by party group nationally.
+#'
+#' @param xml An XML media feed object.
+#'
+#' @return A \code{data.frame} with seven variables: \code{CandidateType} (one
+#'   of \code{PartyGroup}, \code{AmalgamatedGhostGroups}, \code{Formal},
+#'   \code{Informal} or \code{Total}), \code{PartyGroupId},
+#'   \code{PartyGroupCode}, \code{PartyGroupNm}, \code{Percentage}, \code{Swing}
+#'   and \code{Votes}.
+#' @export
+#'
+#' @examples
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_analysis(results_xml)
+#'
+#' @seealso \code{\link{get_mediafeed_analysis_states}} for the same results
+#'   disaggregated by state.
+#' @importFrom xml2 xml_find_all xml_find_first xml_name xml_attr xml_text
+get_mediafeed_analysis <- function(xml) {
+  tmp_nodes <- xml_find_all(xml, "/d1:MediaFeed/d1:Results/d1:Election/d1:House/d1:Analysis/d1:National/d1:FirstPreferences/*")
+
+  tmp_df <- data.frame(CandidateType = xml_name(tmp_nodes),
+             PartyGroupId = xml_attr(xml_find_first(tmp_nodes, "d1:PartyGroupIdentifier"), "Id"),
+             PartyGroupCode = xml_attr(xml_find_first(tmp_nodes, "d1:PartyGroupIdentifier"), "ShortCode"),
+             PartyGroupNm = xml_text(xml_find_first(tmp_nodes, "d1:PartyGroupIdentifier/d1:PartyGroupName")),
+             Percentage = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Percentage"),
+             Swing = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Swing"),
+             Votes = xml_text(xml_find_first(tmp_nodes, "d1:Votes")),
+             stringsAsFactors = FALSE)
+
+  tmp_df$PartyGroupId <- as.integer(tmp_df$PartyGroupId)
+  tmp_df$Votes <- as.integer(tmp_df$Votes)
+  tmp_df$Percentage <- as.numeric(tmp_df$Percentage)
+  tmp_df$Swing <- as.numeric(tmp_df$Swing)
+
+  return(tmp_df)
+
+}
+
+#' Get media feed analysis by state
+#'
+#' Get the AEC's aggregate results by party group by state.
+#'
+#' @param xml An XML media feed object
+#'
+#' @return A \code{data.frame} with eight variables: \code{StateAb},
+#'   \code{CandidateType} (one of \code{PartyGroup},
+#'   \code{AmalgamatedGhostGroups}, \code{Formal}, \code{Informal} or
+#'   \code{Total}), \code{PartyGroupId}, \code{PartyGroupCode},
+#'   \code{PartyGroupNm}, \code{Percentage}, \code{Swing} and \code{Votes}.
+#' @export
+#'
+#' @examples
+#' results_xml <- read_mediafeed_xml(download_mediafeed_file(2022, "Verbose", Archive = TRUE))
+#' get_mediafeed_analysis_states(results_xml)
+#'
+#' @seealso \code{\link{get_mediafeed_analysis}} for the same results as a
+#'   national total.
+#' @importFrom xml2 xml_find_all xml_find_first xml_name xml_attr xml_text
+get_mediafeed_analysis_states <- function(xml) {
+  tmp_nodes <- xml_find_all(xml, "/d1:MediaFeed/d1:Results/d1:Election/d1:House/d1:Analysis/d1:States/d1:State/d1:StateIdentifier|/d1:MediaFeed/d1:Results/d1:Election/d1:House/d1:Analysis/d1:States/d1:State/d1:FirstPreferences/*")
+
+  tmp_df <- data.frame(CandidateType = xml_name(tmp_nodes),
+                       StateAb = xml_attr(tmp_nodes, "Id"),
+                       PartyGroupId = xml_attr(xml_find_first(tmp_nodes, "d1:PartyGroupIdentifier"), "Id"),
+                       PartyGroupCode = xml_attr(xml_find_first(tmp_nodes, "d1:PartyGroupIdentifier"), "ShortCode"),
+                       PartyGroupNm = xml_text(xml_find_first(tmp_nodes, "d1:PartyGroupIdentifier/d1:PartyGroupName")),
+                       Percentage = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Percentage"),
+                       Swing = xml_attr(xml_find_first(tmp_nodes, "d1:Votes"), "Swing"),
+                       Votes = xml_text(xml_find_first(tmp_nodes, "d1:Votes")),
+                       stringsAsFactors = FALSE)
+
+  tmp_df$StateAb <- Fill(tmp_df$StateAb)
+  tmp_df <- tmp_df[tmp_df$CandidateType != "StateIdentifier",]
+
+  tmp_df$PartyGroupId <- as.integer(tmp_df$PartyGroupId)
+  tmp_df$Votes <- as.integer(tmp_df$Votes)
+  tmp_df$Percentage <- as.numeric(tmp_df$Percentage)
+  tmp_df$Swing <- as.numeric(tmp_df$Swing)
+
+  return(tmp_df[c("StateAb", "CandidateType", "PartyGroupId", "PartyGroupCode", "PartyGroupNm", "Percentage", "Swing", "Votes")])
 
 }

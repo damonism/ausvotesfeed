@@ -18,7 +18,7 @@ running the media feed API.}
 election).}
 }
 \value{
-An XML media feed object
+An XML media feed object.
 }
 \description{
 Fetch the current media feed results xml for the nominated election.
