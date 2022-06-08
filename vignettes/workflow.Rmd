@@ -111,10 +111,27 @@ mf_pps <- get_mediafeed_preload_pps(preload_xml)
 
 head(mf_pps)
 ```
-The actual results file returns a table of each candidate for each polling place, and the `get_mediafeed_preload_pps_cand()` function returns a table in that format, which can be easily merged with the results when they are retrieved. 
+The media feed does not include the geocodes of the polling places for some reason, but that is available from the VTR and can be merged with the results of this function. It also includes a PollingPlaceTypeID, which can be handy.
+
+```{r preload_geocodes}
+tmp_pps <- download_file_vtr("GeneralPollingPlacesDownload", 27966, "https://tallyroom.aec.gov.au/Downloads/")
+
+head(tmp_pps)
+
+mf_pps <- mf_pps %>% 
+  left_join(tmp_pps %>% 
+              select(-PollingPlaceNm) %>% 
+              rename(StateAb = State, DivisionId = DivisionID, PollingPlaceId = PollingPlaceID),
+            by = c("DivisionId", "PollingPlaceId"))
+
+rm(tmp_pps)
+```
+
+
+The actual results file returns a table of each candidate for each polling place, and the `get_mediafeed_preload_pps_cand()` function returns a table in that format, which can be easily merged with the results when they are retrieved. It can take a while to run.
 
 Unfortunately this is not possible for the TCP results, because TCP candidates are not included in the preload file. 
-```{r}
+```{r preload_pps_cand}
 mf_pps_cand <- get_mediafeed_preload_pps_cand(preload_xml)
 
 head(mf_pps_cand)
