@@ -32,6 +32,7 @@ mediafeed_display <- function(xml, preload_candidates) {
   names(tmp_display) <- as.character(tmp_divs$DivisionId)
 
   tmp_display <- append(tmp_display, list(Metadata = as.list(get_mediafeed_metadata(xml))))
+  tmp_display[["Divisions"]] <- rbind(tmp_display[["Divisions"]], tmp_divs)
 
   return(tmp_display)
 }
