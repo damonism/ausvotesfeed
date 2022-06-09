@@ -29,9 +29,9 @@ mediafeed_display <- function(xml, preload_candidates) {
 
   tmp_display <- lapply(tmp_divs$DivisionId,
                         function(x) list(fp = tmp_fp[tmp_fp$DivisionId == x, ], tcp = tmp_tcp[tmp_tcp$DivisionId == x, ]))
-  names(tmp_display) <- tmp_divs$DivisionId
+  names(tmp_display) <- as.character(tmp_divs$DivisionId)
 
-  tmp_display <- list(tmp_display, Metadata = list(get_mediafeed_metadata(xml)))
+  tmp_display <- append(tmp_display, list(Metadata = as.list(get_mediafeed_metadata(xml))))
 
   return(tmp_display)
 }
