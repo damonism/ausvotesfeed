@@ -91,6 +91,7 @@ mediafeed_display_fp <- function(xml, preload_candidates) {
   tmp_div <- rbind(tmp_div_fp, tmp_div_total)
   tmp_div <- tmp_div[match(sort(tmp_div$.order), tmp_div$.order),]
   rownames(tmp_div) <- NULL
+  tmp_div$.order <- NULL
   tmp_div[c("StateAb", "DivisionShortCode", "DivisionNm")] <- lapply(tmp_div[c("StateAb", "DivisionShortCode", "DivisionNm")], Fill)
 
   return(tmp_div)
