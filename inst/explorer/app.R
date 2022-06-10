@@ -20,8 +20,13 @@ ui <- fluidPage(
 
     tabsetPanel(type = "tabs",
                 tabPanel("Data",
-                         actionButton("fetch", "Fetch media feed data")
-                         ),
+                         actionButton("fetch", "Fetch media feed data"),
+                         checkboxInput("api", "Use API", value = FALSE),
+                         conditionalPanel(
+                           condition = "input.api == true",
+                           textInput("host", "API Host")
+                         )
+                ),
                 tabPanel("By Division",
                          uiOutput("div_select"),
                          h3("First preferences"),
@@ -40,14 +45,24 @@ server <- function(input, output) {
     #### Data functions ####
 
     v <- reactiveValues(data = NULL)
+    # v$data <- read_mediafeed_xml(download_mediafeed_file(2022, Filetype = "Verbose", Archive = FALSE))
 
     observeEvent(input$fetch, {
-        # withProgress("Fetching new results", value = .5, {
-            v$data <- read_mediafeed_xml(download_mediafeed_file(2022, Filetype = "Verbose", Archive = FALSE))
-        # })
 
-        v$updated <- as.POSIXct(get_mediafeed_metadata(v$data)["Created"], format = "%FT%T")
-        showModal(modalDialog("Results downloaded: ", v$updated))
+      if(input$api == TRUE) {
+
+        tmp_xml <- download_mediafeed_api(input$host, 2022, Filetype = "Verbose", Archive = FALSE)
+
+      } else {
+
+        tmp_xml <- download_mediafeed_file(2022, Filetype = "Verbose", Archive = FALSE)
+
+      }
+
+      v$data <- read_mediafeed_xml(tmp_xml)
+
+      v$updated <- as.POSIXct(get_mediafeed_metadata(v$data)["Created"], format = "%FT%T")
+      showModal(modalDialog("Results downloaded: ", v$updated))
     })
 
     # All of the display data as a reactive object
@@ -83,11 +98,15 @@ server <- function(input, output) {
     hover = TRUE, na = "")
 
     output$div_fp_chart <- renderPlot({
-        tmp_data <- rbind(data.frame(PartNm = div_data()$fp$PartyNm, Percent = div_data()$fp$FP.Percentage, Type = "FP"),
-                          data.frame(PartNm = div_data()$fp$PartyNm, Percent = div_data()$fp$FP.Swing, Type = "Swing"))
+      tmp_div_chart <- div_data()$fp
+      tmp_div_chart <- tmp_div_chart[tmp_div_chart$CandidateType == "Candidate",]
 
-        ggplot(tmp_data, aes(y = PartNm, x = Percent, fill = Type)) +
-            geom_bar(stat = "identity", position = position_dodge())
+      tmp_data <- rbind(data.frame(PartyNm = tmp_div_chart$PartyNm, Percent = tmp_div_chart$FP.Percentage, Type = "FP"),
+                        data.frame(PartyNm = tmp_div_chart$PartyNm, Percent = tmp_div_chart$FP.Swing, Type = "Swing"))
+
+      ggplot(tmp_data, aes(y = PartyNm, x = Percent, fill = Type)) +
+        geom_bar(stat = "identity", position = position_dodge()) +
+        theme_minimal()
     })
 
     output$div_tcp <- renderTable({
