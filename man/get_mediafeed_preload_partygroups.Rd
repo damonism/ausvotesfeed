@@ -10,7 +10,7 @@ get_mediafeed_preload_partygroups(xml)
 \item{xml}{A pointer to an XML preload media feed object.}
 }
 \value{
-A \code{data.frame} with three variables: \code{PartyGroupId}
+A \code{data.frame} with three variables: \code{PartyGroupID}
   (\code{INT}), \code{PartyGroupShortCode} and \code{PartyGroupName}.
 }
 \description{

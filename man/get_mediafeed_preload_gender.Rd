@@ -12,7 +12,7 @@ get_mediafeed_preload_gender(xml, chamber)
 \item{chamber}{One of either \code{House} or \code{Senate}.}
 }
 \value{
-A \code{data.frame} with three columns: \code{CandidateId},
+A \code{data.frame} with three columns: \code{CandidateID},
   \code{Gender} ("male" or "female"), and \code{EventId}
 }
 \description{

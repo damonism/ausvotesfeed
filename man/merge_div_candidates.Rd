@@ -20,7 +20,7 @@ A \code{data.frame}
 }
 \description{
 Add candidate and division details to division-level results by
-\code{CandidateId} and \code{DivisionId}.
+\code{CandidateID} and \code{DivisionID}.
 }
 \details{
 This function runs \code{\link{get_mediafeed_votes_div}} and merges the

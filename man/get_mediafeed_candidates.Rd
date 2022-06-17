@@ -18,7 +18,7 @@ A \code{data.frame} with 9 variables (10 if \code{party} is
 }
 \description{
 List all of the candidates in the results media feed, along with their
-CandidateId and PartyId, mostly for merging with results by CandidateId.
+CandidateID and PartyId, mostly for merging with results by CandidateID.
 }
 \details{
 Note that the list of candidates in the results feed is different from the

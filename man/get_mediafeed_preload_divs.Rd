@@ -10,7 +10,7 @@ get_mediafeed_preload_divs(xml)
 \item{xml}{A pointer to an XML preload media feed object.}
 }
 \value{
-a \code{data.frame} with seven variables: \code{DivisionId},
+a \code{data.frame} with seven variables: \code{DivisionID},
   \code{DivisionShortCode} (a four-character code for the division),
   \code{DivisionNm}, \code{StateAb}, \code{Enrolment.CloseOfRolls},
   \code{Enrolment.Historic} and \code{Enrolment}
@@ -23,10 +23,10 @@ This function extracts the divisions and their associated identifiers
 (including \code{DivisionShortCode}, which only seems to be used in the media
 feed and nowhere else).
 
-Note that \code{\link{get_mediafeed_preload_pps}} includes \code{DivisionId}
+Note that \code{\link{get_mediafeed_preload_pps}} includes \code{DivisionID}
 and \code{DivisionShortName} but not \code{DivisonNm} - this is the only of
 the preload functions where division name is available, so it makes sense to
-join this table to the polling place table by \code{DivisionId}.
+join this table to the polling place table by \code{DivisionID}.
 
 This function also outputs various enrolment numbers for the division.
 \code{EnrolmentHistoric} can be used for enrolment swing calculations, but

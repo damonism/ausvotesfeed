@@ -15,15 +15,15 @@ cand_xml <- read_mediafeed_xml(download_mediafeed_file(2022, Filetype = "Preload
 
 mf_cand <- mf_cand %>%
   left_join(get_mediafeed_preload_gender(cand_xml, "House") %>%
-              select(CandidateId, Gender),
-            by = "CandidateId")
+              select(CandidateID, Gender),
+            by = "CandidateID")
 
 tmp_pps <- download_file_vtr("GeneralPollingPlacesDownload", 27966, "https://tallyroom.aec.gov.au/Downloads/")
 
 mf_pps <- mf_pps %>%
   left_join(tmp_pps %>%
               select(-PollingPlaceNm) %>%
-              rename(StateAb = State, DivisionId = DivisionID, PollingPlaceId = PollingPlaceID),
-            by = c("DivisionId", "PollingPlaceId"))
+              rename(StateAb = State),
+            by = c("DivisionID", "PollingPlaceID"))
 
 save(list = ls(pattern = "mf_"), file = "preload_2022.rds")

@@ -14,7 +14,7 @@
 #'   (two-candidate preferred), \code{tpp} (two party preferred) or \code{total}
 #'   (total first preference votes).
 #'
-#' @return A \code{data.frame} with a \code{DivisionId} column and at least
+#' @return A \code{data.frame} with a \code{DivisionID} column and at least
 #'   current, historic, percentage, swing and matched historic votes.
 #' @export
 #'
@@ -37,12 +37,12 @@ get_mediafeed_votes_div <- function(xml, type) {
   if (type == "fp") {
     tmp_cand_nodes <- xml_find_all(tmp_div_nodes, "d1:PollingDistrictIdentifier|d1:FirstPreferences/d1:Candidate|d1:FirstPreferences/d1:Ghost")
     tmp_vote_prefix <- "FP"
-    tmp_list_ints_type <- c("CandidateId", "FP.Historic", "FP.MatchedHistoric", "FP.Votes")
+    tmp_list_ints_type <- c("CandidateID", "FP.Historic", "FP.MatchedHistoric", "FP.Votes")
     tmp_list_num_type <- c("FP.Percentage", "FP.Swing")
   } else if (type == "tcp") {
     tmp_cand_nodes <- xml_find_all(tmp_div_nodes, "d1:PollingDistrictIdentifier|d1:TwoCandidatePreferred/d1:Candidate")
     tmp_vote_prefix <- "TCP"
-    tmp_list_ints_type <- c("CandidateId", "TCP.Historic", "TCP.MatchedHistoric", "TCP.Votes", "TCP.MatchedHistoricFirstPrefsIn")
+    tmp_list_ints_type <- c("CandidateID", "TCP.Historic", "TCP.MatchedHistoric", "TCP.Votes", "TCP.MatchedHistoricFirstPrefsIn")
     tmp_list_num_type <- c("TCP.Percentage", "TCP.Swing")
   } else if (type == "tpp") {
     tmp_cand_nodes <- xml_find_all(tmp_div_nodes, "d1:PollingDistrictIdentifier|d1:TwoPartyPreferred/d1:Coalition")
@@ -52,16 +52,16 @@ get_mediafeed_votes_div <- function(xml, type) {
   } else if (type == "total") {
     tmp_cand_nodes <- xml_find_all(tmp_div_nodes, "d1:PollingDistrictIdentifier|d1:FirstPreferences/d1:Formal|d1:FirstPreferences/d1:Informal|d1:FirstPreferences/d1:Total")
     tmp_vote_prefix <- "FP"
-    tmp_list_ints_type <- c("CandidateId", "FP.Historic", "FP.MatchedHistoric", "FP.Votes")
+    tmp_list_ints_type <- c("CandidateID", "FP.Historic", "FP.MatchedHistoric", "FP.Votes")
     tmp_list_num_type <- c("FP.Percentage", "FP.Swing")
   } else {
     stop("type must be one of 'fp', 'tcp', 'tpp' or 'total'.")
   }
 
-  tmp_df <- data.frame(DivisionId = xml_attr(tmp_cand_nodes, "Id"),
+  tmp_df <- data.frame(DivisionID = xml_attr(tmp_cand_nodes, "Id"),
                        CandidateType = xml_name(tmp_cand_nodes),
                        stringsAsFactors = FALSE)
-  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df$DivisionID <- Fill(tmp_df$DivisionID)
   tmp_df <- tmp_df[tmp_df$CandidateType != "PollingDistrictIdentifier",]
   if(type == "tpp") {
     tmp_df <- data.frame(tmp_df,
@@ -69,10 +69,10 @@ get_mediafeed_votes_div <- function(xml, type) {
                          CoalitionCode = xml_attr(xml_find_all(tmp_cand_nodes, "d1:CoalitionIdentifier"), "ShortCode"),
                          stringsAsFactors = FALSE)
   } else if (type == "total") {
-    tmp_df$CandidateId <- NA
+    tmp_df$CandidateID <- NA
   } else {
     tmp_df <- data.frame(tmp_df,
-                         CandidateId = xml_attr(xml_find_all(tmp_cand_nodes, "eml:CandidateIdentifier"), "Id"),
+                         CandidateID = xml_attr(xml_find_all(tmp_cand_nodes, "eml:CandidateIdentifier"), "Id"),
                          stringsAsFactors = FALSE)
 
   }
@@ -87,7 +87,7 @@ get_mediafeed_votes_div <- function(xml, type) {
   rownames(tmp_df) <- NULL
 
   # Columns that should be integers
-  tmp_list_ints <- c("DivisionId", tmp_list_ints_type)
+  tmp_list_ints <- c("DivisionID", tmp_list_ints_type)
   # Columns that should be numeric
   tmp_list_num <- c(tmp_list_num_type)
 
@@ -111,10 +111,10 @@ get_mediafeed_votes_div_fp <- function(xml) {
   tmp_div_nodes <- xml_find_all(xml, "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest")
   tmp_cand_nodes <- xml_find_all(tmp_div_nodes, "d1:PollingDistrictIdentifier|d1:FirstPreferences/d1:Candidate|d1:FirstPreferences/d1:Ghost")
 
-  tmp_df <- data.frame(DivisionId = xml_attr(tmp_cand_nodes, "Id"),
+  tmp_df <- data.frame(DivisionID = xml_attr(tmp_cand_nodes, "Id"),
                        CandidateType = xml_name(tmp_cand_nodes),
                        stringsAsFactors = FALSE)
-  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df$DivisionID <- Fill(tmp_df$DivisionID)
   tmp_df <- tmp_df[tmp_df$CandidateType != "PollingDistrictIdentifier",]
   tmp_df <- data.frame(tmp_df,
                        CandidateID = xml_attr(xml_find_all(tmp_cand_nodes, "eml:CandidateIdentifier"), "Id"),
@@ -128,7 +128,7 @@ get_mediafeed_votes_div_fp <- function(xml) {
   tmp_df <- data.frame(tmp_df, tmp_votes_tbl, stringsAsFactors = FALSE)
 
   # Columns that should be integers
-  tmp_list_ints <- c("DivisionId", "CandidateId", "FP.Votes", "FP.Historic", "FP.MatchedHistoric")
+  tmp_list_ints <- c("DivisionID", "CandidateID", "FP.Votes", "FP.Historic", "FP.MatchedHistoric")
   # Columns that should be numeric
   tmp_list_num <- c("FP.Percentage", "FP.Swing")
 
@@ -154,11 +154,11 @@ get_mediafeed_votes_div2 <- function(xml) {
 
   tmp_df <- data.frame(tmp_type,
                        DivisionShortCode = tmp_div_code,
-                       CandidateId = tmp_id,
+                       CandidateID = tmp_id,
                        stringsAsFactors = FALSE)
 
-  tmp_df$DivisionId <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$CandidateId, NA)
-  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df$DivisionID <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$CandidateID, NA)
+  tmp_df$DivisionID <- Fill(tmp_df$DivisionID)
   tmp_df$DivisionShortCode <- Fill(tmp_df$DivisionShortCode)
   tmp_df <- tmp_df[tmp_df$tmp_type == "CandidateIdentifier",]
 
@@ -176,13 +176,13 @@ get_mediafeed_votes_div2 <- function(xml) {
                                stringsAsFactors = FALSE)
 
   tmp_df <- data.frame(tmp_df, tmp_cand_votes, stringsAsFactors = FALSE)
-  tmp_cols_int <- c("CandidateId", "DivisionId", "Historic", "MatchedHistoric", "Votes")
+  tmp_cols_int <- c("CandidateID", "DivisionID", "Historic", "MatchedHistoric", "Votes")
   tmp_cols_num <- c("Percentage", "Swing")
 
   tmp_df[tmp_cols_int] <- sapply(tmp_df[tmp_cols_int], as.integer)
   tmp_df[tmp_cols_num] <- sapply(tmp_df[tmp_cols_num], as.numeric)
 
-  tmp_df[c("DivisionId", "DivisionShortCode", "CandidateId",
+  tmp_df[c("DivisionID", "DivisionShortCode", "CandidateID",
            "Historic", "MatchedHistoric", "Percentage", "Swing", "Votes")]
 }
 

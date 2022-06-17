@@ -11,11 +11,11 @@ get_mediafeed_preload_candidates(xml)
 }
 \value{
 A \code{data.frame} with 22 variables: \code{StateAb},
-  \code{DivisionId}, \code{DivisionShortCode}, \code{DivisionNm},
+  \code{DivisionID}, \code{DivisionShortCode}, \code{DivisionNm},
   \code{CandidateType} (\code{Candidate} or \code{Ghost}), \code{IsGhost}
-  (\code{logical}), \code{CandidateId}, \code{CandidateNm},
+  (\code{logical}), \code{CandidateID}, \code{CandidateNm},
   \code{BallotPosition}, \code{IsIndependent} (\code{logical}),
-  \code{PartyId}, \code{PartyCode}, \code{PartyNm}, \code{Elected}
+  \code{PartyID}, \code{PartyCode}, \code{PartyNm}, \code{Elected}
   (\code{logical}), \code{ElectedHistoric} (\code{logical}), \code{Incumbent}
   (\code{logical}), \code{IncumbentNotional} (\code{logical}),
   \code{FP.Votes}, \code{FP.Percentage}, \code{FP.Swing}, \code{FP.Historic},

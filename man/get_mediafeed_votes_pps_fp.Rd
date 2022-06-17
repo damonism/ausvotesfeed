@@ -10,7 +10,7 @@ get_mediafeed_votes_pps_fp(xml)
 \item{xml}{A pointer to an XML media feed object}
 }
 \value{
-A \code{data.frame} with seven columns: \code{PollingPlaceId},
+A \code{data.frame} with seven columns: \code{PollingPlaceID},
   \code{CandidateType} (one of either \code{Candidate} or \code{Ghost}),
   \code{CandidateID}, \code{FP.Historic}, \code{FP.Percentage},
   \code{FP.Swing} and \code{FP.Votes}.
@@ -27,7 +27,7 @@ The actual results are prefixed with "FP." in order to easily distintinguish
 them from two-candidate preferred and two-party preferred votes.
 
 It assumes that you already have the candidate, divisions and polling place
-details elsewhere, and will join those by PollingPlaceId and CandidateID. In
+details elsewhere, and will join those by PollingPlaceID and CandidateID. In
 particular, this function does not include DivisionID or PartyID.
 
 This function is quite vociferous because 1) it can be slow, so it tells you

@@ -11,7 +11,7 @@ get_mediafeed_votes_pps_tcp(xml)
 }
 \value{
 A \code{data.frame} with the following variables:
-  \code{PollingPlaceId}, \code{CandidateId}, \code{TCP.Historic},
+  \code{PollingPlaceID}, \code{CandidateID}, \code{TCP.Historic},
   \code{TCP.Percentage}, \code{TCP.Swing}, \code{TCP.Votes}.
 }
 \description{

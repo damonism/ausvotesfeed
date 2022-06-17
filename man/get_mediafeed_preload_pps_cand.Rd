@@ -11,8 +11,8 @@ get_mediafeed_preload_pps_cand(xml)
 }
 \value{
 A \code{data.frame} with the following variables: \code{StateAb},
-  \code{DivisionId}, \code{DivisionShortCode}, \code{DivisionNm},
-  \code{PollingPlaceId}, \code{PollingPlaceNm}, \code{CandidateId},
+  \code{DivisionID}, \code{DivisionShortCode}, \code{DivisionNm},
+  \code{PollingPlaceID}, \code{PollingPlaceNm}, \code{CandidateID},
   \code{CandidateType}, \code{IsGhost}, \code{Historic}, \code{Percentage},
   \code{Swing}, \code{Votes}.
 }
@@ -30,7 +30,7 @@ and polling places in exactly the same format and order as
 \code{\link{get_mediafeed_votes_pps_fp}}, which makes it trivial to merge
 with the live results file (you don't even have to join it, you could
 \code{\link{cbind}} it, but you should probably also check that
-\code{PollingPlaceId} and \code{CandidateId} are equal).
+\code{PollingPlaceID} and \code{CandidateID} are equal).
 }
 \examples{
 preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,  "Preload", Archive = TRUE),

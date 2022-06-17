@@ -51,7 +51,7 @@ NULL
 #'
 #' @param xml A pointer to an XML preload media feed object.
 #'
-#' @return A \code{data.frame} with three variables: \code{PartyGroupId}
+#' @return A \code{data.frame} with three variables: \code{PartyGroupID}
 #'   (\code{INT}), \code{PartyGroupShortCode} and \code{PartyGroupName}.
 #' @export
 #'
@@ -67,12 +67,12 @@ get_mediafeed_preload_partygroups <- function(xml) {
 
     tmp_party_nodes <- xml_find_all(xml, "d1:Results/d1:Election/d1:House/d1:Analysis/d1:National/d1:FirstPreferences/d1:PartyGroup")
 
-    tmp_df <- data.frame(as.data.frame(do.call("rbind", xml_attrs(xml_find_all(tmp_party_nodes, "d1:PartyGroupIdentifier")))),
-                         PartyGroupName = xml_text(xml_find_all(tmp_party_nodes, "d1:PartyGroupIdentifier")),
+    tmp_df <- data.frame(as.data.frame(do.call("rbind", xml_attrs(xml_find_all(tmp_party_nodes, "d1:PartyGroupIDentifier")))),
+                         PartyGroupName = xml_text(xml_find_all(tmp_party_nodes, "d1:PartyGroupIDentifier")),
                          stringsAsFactors = FALSE)
 
-    colnames(tmp_df) <- c("PartyGroupId", "PartyGroupShortCode", "PartyGroupName")
-    tmp_df$PartyGroupId <- as.integer(tmp_df$PartyGroupId)
+    colnames(tmp_df) <- c("PartyGroupID", "PartyGroupShortCode", "PartyGroupName")
+    tmp_df$PartyGroupID <- as.integer(tmp_df$PartyGroupID)
 
     return(tmp_df)
 
@@ -87,9 +87,9 @@ get_mediafeed_preload_partygroups <- function(xml) {
 #' XML file.
 #'
 #' Note that the division name is not included is the output of this function,
-#' only the \code{DivisionId} and \code{DivisionShortCode}. To get
+#' only the \code{DivisionID} and \code{DivisionShortCode}. To get
 #' \code{DivisionNm}, join this file with the output of
-#' \code{\link{get_mediafeed_preload_divs}} on \code{DivisionId}.
+#' \code{\link{get_mediafeed_preload_divs}} on \code{DivisionID}.
 #'
 #' Most of the polling places do not have a \code{PollingPlaceClassification}
 #' (that is, they are \code{NA}). As of the 2022 federal election, the
@@ -102,9 +102,9 @@ get_mediafeed_preload_partygroups <- function(xml) {
 #'
 #' @param xml A pointer to an XML preload media feed object.
 #'
-#' @return A \code{data.frame} with five variables: \code{DivisionId},
+#' @return A \code{data.frame} with five variables: \code{DivisionID},
 #'   \code{DivisionNm}, \code{DivisionShortCode}, \code{StateAb},
-#'   \code{PollingPlaceId}, \code{PollingPlaceName} and
+#'   \code{PollingPlaceID}, \code{PollingPlaceName} and
 #'   \code{PollingPlaceClassification}.
 #' @export
 #'
@@ -132,7 +132,7 @@ get_mediafeed_preload_pps <- function(xml) {
   tmp_pps_clas <- xml_attr(tmp_nodes, "Classification")
 
   tmp_df <- data.frame(tmp_type,
-                       PollingPlaceId = tmp_id,
+                       PollingPlaceID = tmp_id,
                        DivisionShortCode = tmp_div_code,
                        DivisionNm = tmp_div_name,
                        StateAb = tmp_state,
@@ -140,16 +140,16 @@ get_mediafeed_preload_pps <- function(xml) {
                        PollingPlaceClassification = tmp_pps_clas,
                        stringsAsFactors = FALSE)
 
-  tmp_df$DivisionId <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$PollingPlaceId, NA)
-  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df$DivisionID <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$PollingPlaceID, NA)
+  tmp_df$DivisionID <- Fill(tmp_df$DivisionID)
   tmp_df$DivisionShortCode <- Fill(tmp_df$DivisionShortCode)
   tmp_df$DivisionNm <- Fill(tmp_df$DivisionNm)
   tmp_df$StateAb <- Fill(tmp_df$StateAb)
   tmp_df <- tmp_df[tmp_df$tmp_type == "PollingPlaceIdentifier",]
 
   # tmp_df$tmp_type <- NULL
-  tmp_df[c("DivisionId", "PollingPlaceId")] <- sapply(tmp_df[c("DivisionId", "PollingPlaceId")], as.integer)
-  tmp_df[c("DivisionId", "DivisionNm", "DivisionShortCode", "StateAb", "PollingPlaceId", "PollingPlaceNm", "PollingPlaceClassification")]
+  tmp_df[c("DivisionID", "PollingPlaceID")] <- sapply(tmp_df[c("DivisionID", "PollingPlaceID")], as.integer)
+  tmp_df[c("DivisionID", "DivisionNm", "DivisionShortCode", "StateAb", "PollingPlaceID", "PollingPlaceNm", "PollingPlaceClassification")]
 
 }
 
@@ -161,10 +161,10 @@ get_mediafeed_preload_pps <- function(xml) {
 #' (including \code{DivisionShortCode}, which only seems to be used in the media
 #' feed and nowhere else).
 #'
-#' Note that \code{\link{get_mediafeed_preload_pps}} includes \code{DivisionId}
+#' Note that \code{\link{get_mediafeed_preload_pps}} includes \code{DivisionID}
 #' and \code{DivisionShortName} but not \code{DivisonNm} - this is the only of
 #' the preload functions where division name is available, so it makes sense to
-#' join this table to the polling place table by \code{DivisionId}.
+#' join this table to the polling place table by \code{DivisionID}.
 #'
 #' This function also outputs various enrolment numbers for the division.
 #' \code{EnrolmentHistoric} can be used for enrolment swing calculations, but
@@ -174,7 +174,7 @@ get_mediafeed_preload_pps <- function(xml) {
 #'
 #' @param xml A pointer to an XML preload media feed object.
 #'
-#' @return a \code{data.frame} with seven variables: \code{DivisionId},
+#' @return a \code{data.frame} with seven variables: \code{DivisionID},
 #'   \code{DivisionShortCode} (a four-character code for the division),
 #'   \code{DivisionNm}, \code{StateAb}, \code{Enrolment.CloseOfRolls},
 #'   \code{Enrolment.Historic} and \code{Enrolment}
@@ -196,7 +196,7 @@ get_mediafeed_preload_divs <- function(xml) {
   tmp_nodes <- xml_find_all(xml, "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier")
 
   tmp_id <- as.data.frame(do.call("rbind", xml_attrs(tmp_nodes)))
-  colnames(tmp_id) <- c("DivisionId", "DivisionShortCode")
+  colnames(tmp_id) <- c("DivisionID", "DivisionShortCode")
   tmp_name <- xml_text(xml_find_all(tmp_nodes, "d1:Name"))
   tmp_state <- xml_attr(xml_find_all(tmp_nodes, "d1:StateIdentifier"), "Id")
 
@@ -212,7 +212,7 @@ get_mediafeed_preload_divs <- function(xml) {
                        tmp_enrolment_df,
                        stringsAsFactors = FALSE)
 
-  tmp_df[c("DivisionId", colnames(tmp_enrolment_df))] <- sapply(tmp_df[c("DivisionId", colnames(tmp_enrolment_df))], as.integer)
+  tmp_df[c("DivisionID", colnames(tmp_enrolment_df))] <- sapply(tmp_df[c("DivisionID", colnames(tmp_enrolment_df))], as.integer)
 
   return(tmp_df)
 }
@@ -222,11 +222,11 @@ get_mediafeed_preload_divs <- function(xml) {
 #' @param xml A pointer to an XML preload media feed object
 #'
 #' @return A \code{data.frame} with 22 variables: \code{StateAb},
-#'   \code{DivisionId}, \code{DivisionShortCode}, \code{DivisionNm},
+#'   \code{DivisionID}, \code{DivisionShortCode}, \code{DivisionNm},
 #'   \code{CandidateType} (\code{Candidate} or \code{Ghost}), \code{IsGhost}
-#'   (\code{logical}), \code{CandidateId}, \code{CandidateNm},
+#'   (\code{logical}), \code{CandidateID}, \code{CandidateNm},
 #'   \code{BallotPosition}, \code{IsIndependent} (\code{logical}),
-#'   \code{PartyId}, \code{PartyCode}, \code{PartyNm}, \code{Elected}
+#'   \code{PartyID}, \code{PartyCode}, \code{PartyNm}, \code{Elected}
 #'   (\code{logical}), \code{ElectedHistoric} (\code{logical}), \code{Incumbent}
 #'   (\code{logical}), \code{IncumbentNotional} (\code{logical}),
 #'   \code{FP.Votes}, \code{FP.Percentage}, \code{FP.Swing}, \code{FP.Historic},
@@ -260,11 +260,11 @@ get_mediafeed_preload_candidates <- function(xml) {
                        StateAb = tmp_div_state,
                        DivisionShortCode = tmp_div_code,
                        DivisionNm = tmp_div_name,
-                       CandidateId = tmp_id,
+                       CandidateID = tmp_id,
                        stringsAsFactors = FALSE)
 
-  tmp_df$DivisionId <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$CandidateId, NA)
-  tmp_df$DivisionId <- Fill(tmp_df$DivisionId)
+  tmp_df$DivisionID <- ifelse(tmp_df$tmp_type == "PollingDistrictIdentifier", tmp_df$CandidateID, NA)
+  tmp_df$DivisionID <- Fill(tmp_df$DivisionID)
   tmp_df$StateAb <- Fill(tmp_df$StateAb)
   tmp_df$DivisionShortCode <- Fill(tmp_df$DivisionShortCode)
   tmp_df$DivisionNm <- Fill(tmp_df$DivisionNm)
@@ -297,11 +297,11 @@ get_mediafeed_preload_candidates <- function(xml) {
                                stringsAsFactors = FALSE)
   colnames(tmp_cand_votes) <- paste("FP", colnames(tmp_cand_votes), sep = ".")
 
-  tmp_cand_df <- data.frame(CandidateId2 = tmp_cand_id,
+  tmp_cand_df <- data.frame(CandidateID2 = tmp_cand_id,
                             CandidateType = tmp_cand_type,
                             IsIndependent = ifelse(is.na(tmp_cand_ind), "false", tmp_cand_ind),
                             CandidateNm = tmp_cand_name,
-                            PartyId = tmp_cand_partyid,
+                            PartyID = tmp_cand_partyid,
                             PartyCode = tmp_cand_partycode,
                             PartyNm = tmp_cand_partyname,
                             BallotPosition = tmp_cand_ballot,
@@ -327,15 +327,15 @@ get_mediafeed_preload_candidates <- function(xml) {
   tmp_cand_df$IsGhost <- ifelse(tmp_cand_df$CandidateType == "Candidate", FALSE, TRUE)
 
   # Check that the table with the division IDs is in the same order as the candidates table.
-  tmp_cand_df$Check <- tmp_cand_df$CandidateId2 == tmp_cand_df$CandidateId
+  tmp_cand_df$Check <- tmp_cand_df$CandidateID2 == tmp_cand_df$CandidateID
   if(nrow(tmp_cand_df[tmp_cand_df$Check == FALSE,]) != 0) {
     stop("Candidate extract did not match Division extract.")
   }
 
-  tmp_cand_df[c("StateAb", "DivisionId", "DivisionShortCode", "DivisionNm",
-                "CandidateType", "IsGhost", "CandidateId", "CandidateNm",
+  tmp_cand_df[c("StateAb", "DivisionID", "DivisionShortCode", "DivisionNm",
+                "CandidateType", "IsGhost", "CandidateID", "CandidateNm",
                 "BallotPosition",
-                "IsIndependent", "PartyId", "PartyCode", "PartyNm",
+                "IsIndependent", "PartyID", "PartyCode", "PartyNm",
                 "Elected", "ElectedHistoric", "Incumbent", "IncumbentNotional",
                 "FP.Votes", "FP.Percentage", "FP.Swing", "FP.Historic", "FP.MatchedHistoric")]
 
@@ -355,13 +355,13 @@ get_mediafeed_preload_candidates <- function(xml) {
 #' \code{\link{get_mediafeed_votes_pps_fp}}, which makes it trivial to merge
 #' with the live results file (you don't even have to join it, you could
 #' \code{\link{cbind}} it, but you should probably also check that
-#' \code{PollingPlaceId} and \code{CandidateId} are equal).
+#' \code{PollingPlaceID} and \code{CandidateID} are equal).
 #'
 #' @param xml A pointer to an XML preload media feed object
 #'
 #' @return A \code{data.frame} with the following variables: \code{StateAb},
-#'   \code{DivisionId}, \code{DivisionShortCode}, \code{DivisionNm},
-#'   \code{PollingPlaceId}, \code{PollingPlaceNm}, \code{CandidateId},
+#'   \code{DivisionID}, \code{DivisionShortCode}, \code{DivisionNm},
+#'   \code{PollingPlaceID}, \code{PollingPlaceNm}, \code{CandidateID},
 #'   \code{CandidateType}, \code{IsGhost}, \code{Historic}, \code{Percentage},
 #'   \code{Swing}, \code{Votes}.
 #' @export
@@ -379,7 +379,7 @@ get_mediafeed_preload_pps_cand <- function(xml) {
                                        "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace/d1:FirstPreferences/d1:Ghost",
                                        sep = "|"))
 
-  # # It isn't actually any quickler if you leave off the DivisionId, but it is
+  # # It isn't actually any quickler if you leave off the DivisionID, but it is
   # # less useful
   # tmp_nodes <- xml_find_all(preload_xml, paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace/d1:PollingPlaceIdentifier",
   #                                              "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingPlaces/d1:PollingPlace/d1:FirstPreferences/d1:Candidate",
@@ -413,12 +413,12 @@ get_mediafeed_preload_pps_cand <- function(xml) {
                        StateAb = tmp_state,
                        PollingPlaceNm = tmp_pps_name,
                        # PollingPlaceClassification = tmp_pps_clas,
-                       CandidateId = tmp_cand_id,
+                       CandidateID = tmp_cand_id,
                        stringsAsFactors = FALSE)
 
-  tmp_df$DivisionId <- ifelse(tmp_df$CandidateType == "PollingDistrictIdentifier", tmp_df$Id, NA)
-  tmp_df[c("Id", "DivisionShortCode", "DivisionNm", "StateAb", "DivisionId")] <- lapply(tmp_df[c("Id", "DivisionShortCode", "DivisionNm", "StateAb", "DivisionId")], Fill)
-  tmp_df$PollingPlaceId <- tmp_df$Id
+  tmp_df$DivisionID <- ifelse(tmp_df$CandidateType == "PollingDistrictIdentifier", tmp_df$Id, NA)
+  tmp_df[c("Id", "DivisionShortCode", "DivisionNm", "StateAb", "DivisionID")] <- lapply(tmp_df[c("Id", "DivisionShortCode", "DivisionNm", "StateAb", "DivisionID")], Fill)
+  tmp_df$PollingPlaceID <- tmp_df$Id
   tmp_df <- tmp_df[tmp_df$CandidateType != "PollingDistrictIdentifier",]
   tmp_df$PollingPlaceNm <- Fill(tmp_df$PollingPlaceNm)
   tmp_df <- tmp_df[tmp_df$CandidateType != "PollingPlaceIdentifier",]
@@ -434,7 +434,7 @@ get_mediafeed_preload_pps_cand <- function(xml) {
   }
 
   tmp_df <- data.frame(tmp_df, tmp_votes, stringsAsFactors = FALSE)
-  tmp_col_int <- c("CandidateId", "DivisionId", "PollingPlaceId", "Historic", "Votes")
+  tmp_col_int <- c("CandidateID", "DivisionID", "PollingPlaceID", "Historic", "Votes")
   tmp_col_num <- c("Percentage", "Swing")
 
   tmp_df$IsGhost <- ifelse(tmp_df$CandidateType == "Ghost", TRUE, FALSE)
@@ -442,9 +442,9 @@ get_mediafeed_preload_pps_cand <- function(xml) {
   tmp_df[tmp_col_int] <- sapply(tmp_df[tmp_col_int], as.integer)
   tmp_df[tmp_col_num] <- sapply(tmp_df[tmp_col_num], as.numeric)
 
-  tmp_df[c("StateAb", "DivisionId", "DivisionShortCode", "DivisionNm",
-           "PollingPlaceId", "PollingPlaceNm",
-           "CandidateId", "CandidateType", "IsGhost",
+  tmp_df[c("StateAb", "DivisionID", "DivisionShortCode", "DivisionNm",
+           "PollingPlaceID", "PollingPlaceNm",
+           "CandidateID", "CandidateType", "IsGhost",
            "Historic", "Percentage", "Swing", "Votes")]
 }
 
@@ -491,7 +491,7 @@ get_mediafeed_preload_votes_type <- function(xml) {
 #' @param xml A pointer to an XML media feed object.
 #' @param chamber One of either \code{House} or \code{Senate}.
 #'
-#' @return A \code{data.frame} with three columns: \code{CandidateId},
+#' @return A \code{data.frame} with three columns: \code{CandidateID},
 #'   \code{Gender} ("male" or "female"), and \code{EventId}
 #' @export
 #'
@@ -517,7 +517,7 @@ get_mediafeed_preload_gender <- function(xml, chamber) {
     stop("chamber must be either 'house' or 'senate'")
   }
 
-  tmp_df <- data.frame(CandidateId = as.integer(xml_attr(xml_find_all(xml,
+  tmp_df <- data.frame(CandidateID = as.integer(xml_attr(xml_find_all(xml,
                                                                       paste0("//d1:ElectionIdentifier[@Id=\"", tmp_chamber, "\"]/../d1:Contest/d1:Candidate/d1:CandidateIdentifier")), "Id")),
                        Gender = xml_text(xml_find_all(xml, paste0("//d1:ElectionIdentifier[@Id=\"", tmp_chamber, "\"]/../d1:Contest/d1:Candidate/d1:Gender"))),
                        stringsAsFactors = FALSE)
@@ -558,8 +558,8 @@ get_mediafeed_preload_gender <- function(xml, chamber) {
 #' @export
 #' @return A \code{data.frame} with 20 variables: \code{StateAb},
 #'   \code{CandidateType} (either \code{Candidate} or
-#'   \code{UngroupedCandidate}), \code{Ticket}, \code{GroupId}, \code{GroupNm},
-#'   \code{CandidateId}, \code{CandidateNm}, \code{PartyId}, \code{PartyAb},
+#'   \code{UngroupedCandidate}), \code{Ticket}, \code{GroupID}, \code{GroupNm},
+#'   \code{CandidateID}, \code{CandidateNm}, \code{PartyID}, \code{PartyAb},
 #'   \code{PartyNm}, \code{IsIndepenendent} (\code{logical}),
 #'   \code{BallotPosition}, \code{Elected} (\code{logical}),
 #'   \code{HistoricElected} (\code{logical}), \code{Incumbent} (\code{logical}),
@@ -585,9 +585,9 @@ get_mediafeed_preload_candidates_sen <- function(xml) {
                        id = xml_attr(tmp_nodes, "Id"),
                        Ticket = xml_text(xml_find_first(tmp_nodes, "d1:Ticket")),
                        GroupNm = xml_text(xml_find_first(tmp_nodes, "d1:GroupName")),
-                       CandidateId = xml_attr(xml_find_first(tmp_nodes, "eml:CandidateIdentifier"), "Id"),
+                       CandidateID = xml_attr(xml_find_first(tmp_nodes, "eml:CandidateIdentifier"), "Id"),
                        CandidateNm = xml_text(xml_find_first(tmp_nodes, "eml:CandidateIdentifier/eml:CandidateName")),
-                       PartyId = xml_attr(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier"), "Id"),
+                       PartyID = xml_attr(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier"), "Id"),
                        PartyAb = xml_attr(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier"), "ShortCode"),
                        PartyNm = xml_text(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier/eml:RegisteredName")),
                        IsIndependent = xml_attr(tmp_nodes, "Independent"),
@@ -604,13 +604,13 @@ get_mediafeed_preload_candidates_sen <- function(xml) {
 
   tmp_df$StateAb <- ifelse(tmp_df$CandidateType == "ContestIdentifier", tmp_df$id, NA)
   tmp_df$StateAb <- Fill(tmp_df$StateAb)
-  tmp_df$GroupId <- ifelse(tmp_df$CandidateType == "GroupIdentifier", tmp_df$id, NA)
-  tmp_df$GroupId[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupId[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
+  tmp_df$GroupID <- ifelse(tmp_df$CandidateType == "GroupIdentifier", tmp_df$id, NA)
+  tmp_df$GroupID[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupID[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
   tmp_df$Ticket[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$Ticket[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
   tmp_df$GroupNm[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupNm[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
-  tmp_df <- tmp_df[!tmp_df$CandidateType %in% c("ContestIdentifier", "GroupIdentifier", "TicketVotes", "Unapportioned"),]
+  tmp_df <- tmp_df[!tmp_df$CandidateType %in% c("ContestIdentifier", "GroupIDentifier", "TicketVotes", "Unapportioned"),]
 
-  tmp_col_num <- c("GroupId", "CandidateId", "PartyId", "BallotPosition", "Historic", "Votes")
+  tmp_col_num <- c("GroupID", "CandidateID", "PartyID", "BallotPosition", "Historic", "Votes")
   tmp_df[tmp_col_num] <- sapply(tmp_df[tmp_col_num], as.integer)
   tmp_df[c("Percentage", "Swing", "QuotaProportion")] <- sapply(tmp_df[c("Percentage", "Swing", "QuotaProportion")], as.numeric)
   tmp_df$IsIndependent <- ifelse(is.na(tmp_df$IsIndependent), FALSE,
@@ -619,9 +619,9 @@ get_mediafeed_preload_candidates_sen <- function(xml) {
                                                                  function(x) ifelse(x == "true", TRUE, FALSE))
 
   tmp_df[c("StateAb", "CandidateType",
-           "Ticket", "GroupId", "GroupNm",
-           "CandidateId", "CandidateNm",
-           "PartyId", "PartyAb", "PartyNm", "IsIndependent",
+           "Ticket", "GroupID", "GroupNm",
+           "CandidateID", "CandidateNm",
+           "PartyID", "PartyAb", "PartyNm", "IsIndependent",
            "BallotPosition", "Elected", "ElectedHistoric", "Incumbent",
            "Historic", "Percentage", "Swing", "QuotaProportion", "Votes")]
 

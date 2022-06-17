@@ -13,7 +13,7 @@ get_mediafeed_analysis_states(xml)
 A \code{data.frame} with eight variables: \code{StateAb},
   \code{CandidateType} (one of \code{PartyGroup},
   \code{AmalgamatedGhostGroups}, \code{Formal}, \code{Informal} or
-  \code{Total}), \code{PartyGroupId}, \code{PartyGroupCode},
+  \code{Total}), \code{PartyGroupID}, \code{PartyGroupCode},
   \code{PartyGroupNm}, \code{Percentage}, \code{Swing} and \code{Votes}.
 }
 \description{

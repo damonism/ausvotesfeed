@@ -12,8 +12,8 @@ get_mediafeed_preload_candidates_sen(xml)
 \value{
 A \code{data.frame} with 20 variables: \code{StateAb},
   \code{CandidateType} (either \code{Candidate} or
-  \code{UngroupedCandidate}), \code{Ticket}, \code{GroupId}, \code{GroupNm},
-  \code{CandidateId}, \code{CandidateNm}, \code{PartyId}, \code{PartyAb},
+  \code{UngroupedCandidate}), \code{Ticket}, \code{GroupID}, \code{GroupNm},
+  \code{CandidateID}, \code{CandidateNm}, \code{PartyID}, \code{PartyAb},
   \code{PartyNm}, \code{IsIndepenendent} (\code{logical}),
   \code{BallotPosition}, \code{Elected} (\code{logical}),
   \code{HistoricElected} (\code{logical}), \code{Incumbent} (\code{logical}),

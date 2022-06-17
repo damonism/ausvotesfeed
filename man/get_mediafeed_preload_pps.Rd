@@ -10,9 +10,9 @@ get_mediafeed_preload_pps(xml)
 \item{xml}{A pointer to an XML preload media feed object.}
 }
 \value{
-A \code{data.frame} with five variables: \code{DivisionId},
+A \code{data.frame} with five variables: \code{DivisionID},
   \code{DivisionNm}, \code{DivisionShortCode}, \code{StateAb},
-  \code{PollingPlaceId}, \code{PollingPlaceName} and
+  \code{PollingPlaceID}, \code{PollingPlaceName} and
   \code{PollingPlaceClassification}.
 }
 \description{
@@ -21,9 +21,9 @@ XML file.
 }
 \details{
 Note that the division name is not included is the output of this function,
-only the \code{DivisionId} and \code{DivisionShortCode}. To get
+only the \code{DivisionID} and \code{DivisionShortCode}. To get
 \code{DivisionNm}, join this file with the output of
-\code{\link{get_mediafeed_preload_divs}} on \code{DivisionId}.
+\code{\link{get_mediafeed_preload_divs}} on \code{DivisionID}.
 
 Most of the polling places do not have a \code{PollingPlaceClassification}
 (that is, they are \code{NA}). As of the 2022 federal election, the

@@ -13,8 +13,8 @@ get_mediafeed_votes_type(xml, count = "fp")
 two-candidate preferred.}
 }
 \value{
-a \code{data.frame} with seven variables: \code{CandidateId},
-  \code{DivisionId}, \code{Type} (\code{Ordinary}, \code{Absent},
+a \code{data.frame} with seven variables: \code{CandidateID},
+  \code{DivisionID}, \code{Type} (\code{Ordinary}, \code{Absent},
   \code{Provisional}, \code{PrePoll}, \code{Postal}), \code{Historic},
   \code{Percentage}, \code{Swing} and \code{Votes}.
 }

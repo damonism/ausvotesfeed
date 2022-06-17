@@ -14,7 +14,7 @@ get_mediafeed_votes_div(xml, type)
 (total first preference votes).}
 }
 \value{
-A \code{data.frame} with a \code{DivisionId} column and at least
+A \code{data.frame} with a \code{DivisionID} column and at least
   current, historic, percentage, swing and matched historic votes.
 }
 \description{

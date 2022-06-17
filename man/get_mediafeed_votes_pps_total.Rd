@@ -10,7 +10,7 @@ get_mediafeed_votes_pps_total(xml)
 \item{xml}{A pointer to an XML media feed object}
 }
 \value{
-A \code{data.frame} with six variables: \code{PollingPlaceId},
+A \code{data.frame} with six variables: \code{PollingPlaceID},
   \code{VoteTpe} (one of either \code{Formal}, \code{Informal} or
   \code{Total}), \code{Historic}, \code{Percentage}, \code{Swing} and
   \code{Votes}.

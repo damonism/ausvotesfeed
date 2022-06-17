@@ -42,7 +42,7 @@ NULL
 #' them from two-candidate preferred and two-party preferred votes.
 #'
 #' It assumes that you already have the candidate, divisions and polling place
-#' details elsewhere, and will join those by PollingPlaceId and CandidateID. In
+#' details elsewhere, and will join those by PollingPlaceID and CandidateID. In
 #' particular, this function does not include DivisionID or PartyID.
 #'
 #' This function is quite vociferous because 1) it can be slow, so it tells you
@@ -52,7 +52,7 @@ NULL
 #'
 #' @param xml A pointer to an XML media feed object
 #'
-#' @return A \code{data.frame} with seven columns: \code{PollingPlaceId},
+#' @return A \code{data.frame} with seven columns: \code{PollingPlaceID},
 #'   \code{CandidateType} (one of either \code{Candidate} or \code{Ghost}),
 #'   \code{CandidateID}, \code{FP.Historic}, \code{FP.Percentage},
 #'   \code{FP.Swing} and \code{FP.Votes}.
@@ -78,18 +78,18 @@ get_mediafeed_votes_pps_fp <- function(xml) {
   message("Fetching candidate types... ", appendLF = FALSE)
   tmp_cand_types <- xml_name(tmp_pps_cand_nodes)
   if(length(tmp_pps_ids) != length(tmp_cand_types)) {
-    stop("Polling place IDs and candidate types not the same lenght.")
+    stop("Polling place IDs and candidate types not the same length.")
   }
 
   message("Joining them together... ", appendLF = FALSE)
-  fp_pps_df <- data.frame(PollingPlaceId = tmp_pps_ids,
+  fp_pps_df <- data.frame(PollingPlaceID = tmp_pps_ids,
                           CandidateType = tmp_cand_types,
                           stringsAsFactors = FALSE)
   message("Done.")
 
   message("Filling polling place IDs... ", appendLF = FALSE)
   # The Fill function is in utility_functions.R
-  fp_pps_df$PollingPlaceId <- Fill(fp_pps_df$PollingPlaceId)
+  fp_pps_df$PollingPlaceID <- Fill(fp_pps_df$PollingPlaceID)
   message("Done.")
   fp_pps_df <- fp_pps_df[fp_pps_df$CandidateType != "PollingPlaceIdentifier",]
 
@@ -129,7 +129,7 @@ get_mediafeed_votes_pps_fp <- function(xml) {
                           tmp_votes_tbl)
 
   # Columns that should be integers
-  tmp_list_ints <- c("PollingPlaceId", "CandidateID", "FP.Votes", "FP.Historic")
+  tmp_list_ints <- c("PollingPlaceID", "CandidateID", "FP.Votes", "FP.Historic")
   # Columns that should be numeric
   tmp_list_num <- c("FP.Percentage", "FP.Swing")
 
@@ -144,7 +144,7 @@ get_mediafeed_votes_pps_fp <- function(xml) {
 #' @param xml A pointer to an XML media feed object
 #'
 #' @return A \code{data.frame} with the following variables:
-#'   \code{PollingPlaceId}, \code{CandidateId}, \code{TCP.Historic},
+#'   \code{PollingPlaceID}, \code{CandidateID}, \code{TCP.Historic},
 #'   \code{TCP.Percentage}, \code{TCP.Swing}, \code{TCP.Votes}.
 #' @export
 #'
@@ -164,11 +164,11 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
     stop("Polling place IDs and candidate types not the same lenght.")
   }
 
-  tcp_pps_df <- data.frame(PollingPlaceId = tmp_pps_ids,
+  tcp_pps_df <- data.frame(PollingPlaceID = tmp_pps_ids,
                            CandidateType = tmp_cand_types,
                            stringsAsFactors = FALSE)
 
-  tcp_pps_df$PollingPlaceId <- Fill(tcp_pps_df$PollingPlaceId)
+  tcp_pps_df$PollingPlaceID <- Fill(tcp_pps_df$PollingPlaceID)
   tcp_pps_df <- tcp_pps_df[tcp_pps_df$CandidateType != "PollingPlaceIdentifier",]
 
   tmp_cand_ids <- xml_attr(xml_find_all(tmp_pps_cand_nodes, "eml:CandidateIdentifier"), "Id")
@@ -177,7 +177,7 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
   }
 
   tcp_pps_df <- data.frame(tcp_pps_df,
-                           CandidateId = tmp_cand_ids,
+                           CandidateID = tmp_cand_ids,
                            stringsAsFactors = FALSE)
   # Get the votes
   message("Fetching votes: Historic votes... ", appendLF = FALSE)
@@ -214,7 +214,7 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
   } else {
 
     # Columns that should be integers
-    tmp_list_ints <- c("PollingPlaceId", "CandidateId", "TCP.Votes", "TCP.Historic")
+    tmp_list_ints <- c("PollingPlaceID", "CandidateID", "TCP.Votes", "TCP.Historic")
     # Columns that should be numeric
     tmp_list_num <- c("TCP.Percentage", "TCP.Swing")
 
@@ -234,7 +234,7 @@ get_mediafeed_votes_pps_tcp <- function(xml) {
 #'
 #' @param xml A pointer to an XML media feed object
 #'
-#' @return A \code{data.frame} with six variables: \code{PollingPlaceId},
+#' @return A \code{data.frame} with six variables: \code{PollingPlaceID},
 #'   \code{VoteTpe} (one of either \code{Formal}, \code{Informal} or
 #'   \code{Total}), \code{Historic}, \code{Percentage}, \code{Swing} and
 #'   \code{Votes}.
@@ -264,11 +264,11 @@ get_mediafeed_votes_pps_total <- function(xml) {
     stop("Polling place IDs and candidate types not the same lenght.")
   }
 
-  tmp_df <- data.frame(PollingPlaceId = tmp_pps_ids,
+  tmp_df <- data.frame(PollingPlaceID = tmp_pps_ids,
                        VoteType = tmp_vote_types,
                        stringsAsFactors = FALSE)
 
-  tmp_df$PollingPlaceId <- Fill(tmp_df$PollingPlaceId)
+  tmp_df$PollingPlaceID <- Fill(tmp_df$PollingPlaceID)
   tmp_df <- tmp_df[tmp_df$VoteType != "PollingPlaceIdentifier",]
 
   # tmp_cand_ids <- xml_attr(xml_find_all(tmp_votes_nodes, "eml:CandidateIdentifier"), "Id")
@@ -304,7 +304,7 @@ get_mediafeed_votes_pps_total <- function(xml) {
                        tmp_votes_tbl)
 
   # Columns that should be integers
-  tmp_list_ints <- c("PollingPlaceId", "Historic", "Votes")
+  tmp_list_ints <- c("PollingPlaceID", "Historic", "Votes")
   # Columns that should be numeric
   tmp_list_num <- c("Percentage", "Swing")
 
@@ -324,11 +324,11 @@ get_mediafeed_votes_pps2 <- function(xml){
                                            sep = "|"))
 
   tmp_df <- data.frame(CandidateType = xml_name(tmp_pps_nodes),
-                       PollingPlaceId = xml_attr(tmp_pps_nodes, "Id"),
-                       CandidateId = xml_attr(xml_find_first(tmp_pps_nodes, "eml:CandidateIdentifier"), "Id"),
+                       PollingPlaceID = xml_attr(tmp_pps_nodes, "Id"),
+                       CandidateID = xml_attr(xml_find_first(tmp_pps_nodes, "eml:CandidateIdentifier"), "Id"),
                        stringsAsFactors = FALSE)
 
-  tmp_df$PollingPlaceId <- Fill(tmp_df$PollingPlaceId)
+  tmp_df$PollingPlaceID <- Fill(tmp_df$PollingPlaceID)
   tmp_df <- tmp_df[tmp_df$CandidateType != "PollingPlaceIdentifier",]
 
   tmp_votes <- data.frame(as.data.frame(do.call("rbind", xml_attrs(xml_find_all(tmp_pps_nodes, "d1:Votes")))),
@@ -337,12 +337,12 @@ get_mediafeed_votes_pps2 <- function(xml){
 
   tmp_df <- data.frame(tmp_df, tmp_votes, stringsAsFactors = FALSE)
   tmp_df$IsGhost <- ifelse(tmp_df$CandidateType == "Ghost", TRUE, FALSE)
-  tmp_cols_int <- c("PollingPlaceId", "CandidateId", "Historic", "Votes")
+  tmp_cols_int <- c("PollingPlaceID", "CandidateID", "Historic", "Votes")
   tmp_cols_num <- c("Percentage", "Swing")
   tmp_df[tmp_cols_int] <- sapply(tmp_df[tmp_cols_int], as.integer)
   tmp_df[tmp_cols_num] <- sapply(tmp_df[tmp_cols_num], as.integer)
 
-  return(tmp_df[c("PollingPlaceId", "CandidateId", "CandidateType", "IsGhost",
+  return(tmp_df[c("PollingPlaceID", "CandidateID", "CandidateType", "IsGhost",
                   "Historic", "Percentage", "Swing", "Votes")])
 
 }

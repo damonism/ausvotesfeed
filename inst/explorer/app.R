@@ -74,7 +74,7 @@ server <- function(input, output) {
 
     output$div_select <- renderUI({
         div_df <- display_data()$Divisions[order(display_data()$Divisions$DivisionNm),]
-        div_labels <- div_df$DivisionId
+        div_labels <- div_df$DivisionID
         names(div_labels) <- div_df$DivisionNm
         selectInput("division", label = "Select division", choices = div_labels)
     })
