@@ -27,6 +27,8 @@ ui <- fluidPage(
                            textInput("host", "API Host")
                          )
                 ),
+                tabPanel("TCP Leading",
+                         dataTableOutput("tcp_lead")),
                 tabPanel("By Division",
                          uiOutput("div_select"),
                          h3("First preferences"),
@@ -77,6 +79,24 @@ server <- function(input, output) {
         div_labels <- div_df$DivisionID
         names(div_labels) <- div_df$DivisionNm
         selectInput("division", label = "Select division", choices = div_labels)
+    })
+
+    #### TCP Functions ####
+
+    tcp_data <- reactive({
+      tmp_tcp <- get_mediafeed_votes_div(v$data, "tcp")
+      tmp_tcp <- merge(tmp_tcp, mf_cand, by = c("CandidateID", "DivisionID", "CandidateType"))
+
+      # Previous party
+      tmp_inc <- mf_cand[mf_cand$Incumbent == TRUE | mf_cand$IncumbentNotional == TRUE,][c("DivisionID", "PartyNm", "PartyCode")]
+      colnames(tmp_inc) <- c("DivisionID", "PartyNm.Prev", "PartyCode.Prev")
+      merge(tmp_tcp, tmp_inc, by = c("DivisionID"), all.x = TRUE)
+    })
+
+    output$tcp_lead <- renderDataTable({
+      tmp_tcp_data <- tcp_data()
+      tmp_tcp_data$PartyNm <- ifelse(tmp_tcp_data$IsIndependent == TRUE, "Independent", tmp_tcp_data$PartyNm)
+      tmp_tcp_data[tmp_tcp_data$TCP.Percentage > 50,][c("DivisionNm", "StateAb", "CandidateNm", "Gender", "PartyCode.Prev", "PartyCode", "PartyNm", "TCP.Votes", "TCP.Percentage")]
     })
 
     #### Division functions ####

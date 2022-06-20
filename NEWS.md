@@ -1,3 +1,9 @@
+# ausvotesfeed (delevelopment version)
+
+## 20 June 2022
+
+* Added initial TCP tab to explorer Shiny app.
+
 # ausvotesfeed 0.1.1
 
 ## 20 June 2022
