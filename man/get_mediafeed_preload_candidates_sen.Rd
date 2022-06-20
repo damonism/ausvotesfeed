@@ -15,10 +15,10 @@ A \code{data.frame} with 20 variables: \code{StateAb},
   \code{UngroupedCandidate}), \code{Ticket}, \code{GroupID}, \code{GroupNm},
   \code{CandidateID}, \code{CandidateNm}, \code{PartyID}, \code{PartyAb},
   \code{PartyNm}, \code{IsIndepenendent} (\code{logical}),
-  \code{BallotPosition}, \code{Elected} (\code{logical}),
-  \code{HistoricElected} (\code{logical}), \code{Incumbent} (\code{logical}),
-  \code{Historic} (votes), \code{Percentage}, \code{Swing},
-  \code{QuotaProportion} and \code{Votes}.
+  \code{NoAffiliation} (\code{logical}), \code{BallotPosition},
+  \code{Elected} (\code{logical}), \code{HistoricElected} (\code{logical}),
+  \code{Incumbent} (\code{logical}), \code{Historic} (votes),
+  \code{Percentage}, \code{Swing}, \code{QuotaProportion} and \code{Votes}.
 }
 \description{
 Extract information on Senate candidates from the media feed preload file.

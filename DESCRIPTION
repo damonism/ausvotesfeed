@@ -1,7 +1,7 @@
 Package: ausvotesfeed
 Type: Package
 Title: Access AEC Live Election Results
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Damon", "Muller", email = "admin@ausvotes.org",
                   role = c("aut", "cre"))
 Description: Download election results from the Australina Electoral Commission's Virtual Tally Room and media feed xml files.

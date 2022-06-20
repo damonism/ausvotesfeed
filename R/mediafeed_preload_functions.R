@@ -561,10 +561,10 @@ get_mediafeed_preload_gender <- function(xml, chamber) {
 #'   \code{UngroupedCandidate}), \code{Ticket}, \code{GroupID}, \code{GroupNm},
 #'   \code{CandidateID}, \code{CandidateNm}, \code{PartyID}, \code{PartyAb},
 #'   \code{PartyNm}, \code{IsIndepenendent} (\code{logical}),
-#'   \code{BallotPosition}, \code{Elected} (\code{logical}),
-#'   \code{HistoricElected} (\code{logical}), \code{Incumbent} (\code{logical}),
-#'   \code{Historic} (votes), \code{Percentage}, \code{Swing},
-#'   \code{QuotaProportion} and \code{Votes}.
+#'   \code{NoAffiliation} (\code{logical}), \code{BallotPosition},
+#'   \code{Elected} (\code{logical}), \code{HistoricElected} (\code{logical}),
+#'   \code{Incumbent} (\code{logical}), \code{Historic} (votes),
+#'   \code{Percentage}, \code{Swing}, \code{QuotaProportion} and \code{Votes}.
 #'
 #' @examples
 #' preload_xml <- read_mediafeed_xml(download_mediafeed_file(2022,  "Preload", Archive = TRUE),
@@ -591,6 +591,7 @@ get_mediafeed_preload_candidates_sen <- function(xml) {
                        PartyAb = xml_attr(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier"), "ShortCode"),
                        PartyNm = xml_text(xml_find_first(tmp_nodes, "eml:AffiliationIdentifier/eml:RegisteredName")),
                        IsIndependent = xml_attr(tmp_nodes, "Independent"),
+                       NoAffiliation = xml_attr(tmp_nodes, "NoAffiliation"),
                        BallotPosition = xml_text(xml_find_first(tmp_nodes, "d1:BallotPosition")),
                        Elected = xml_text(xml_find_first(tmp_nodes, "d1:Elected")),
                        ElectedHistoric = xml_attr(xml_find_first(tmp_nodes, "d1:Elected"), "Historic"),
@@ -605,6 +606,8 @@ get_mediafeed_preload_candidates_sen <- function(xml) {
   tmp_df$StateAb <- ifelse(tmp_df$CandidateType == "ContestIdentifier", tmp_df$id, NA)
   tmp_df$StateAb <- Fill(tmp_df$StateAb)
   tmp_df$GroupID <- ifelse(tmp_df$CandidateType == "GroupIdentifier", tmp_df$id, NA)
+  # Add group name to those groups without one
+  tmp_df$GroupNm <- ifelse(is.na(tmp_df$GroupNm) & !is.na(tmp_df$Ticket), paste0("Group ", tmp_df$Ticket), tmp_df$GroupNm)
   tmp_df$GroupID[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupID[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
   tmp_df$Ticket[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$Ticket[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
   tmp_df$GroupNm[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")] <- Fill(tmp_df$GroupNm[!tmp_df$CandidateType %in% c("ContestIdentifier", "UngroupedCandidate")])
@@ -615,13 +618,15 @@ get_mediafeed_preload_candidates_sen <- function(xml) {
   tmp_df[c("Percentage", "Swing", "QuotaProportion")] <- sapply(tmp_df[c("Percentage", "Swing", "QuotaProportion")], as.numeric)
   tmp_df$IsIndependent <- ifelse(is.na(tmp_df$IsIndependent), FALSE,
                                  ifelse(tmp_df$IsIndependent == "true", TRUE, FALSE))
+  tmp_df$NoAffiliation <- ifelse(is.na(tmp_df$NoAffiliation), FALSE,
+                                 ifelse(tmp_df$NoAffiliation == "true", TRUE, FALSE))
   tmp_df[c("Elected", "ElectedHistoric", "Incumbent")] <- lapply(tmp_df[c("Elected", "ElectedHistoric", "Incumbent")],
                                                                  function(x) ifelse(x == "true", TRUE, FALSE))
 
   tmp_df[c("StateAb", "CandidateType",
            "Ticket", "GroupID", "GroupNm",
            "CandidateID", "CandidateNm",
-           "PartyID", "PartyAb", "PartyNm", "IsIndependent",
+           "PartyID", "PartyAb", "PartyNm", "IsIndependent", "NoAffiliation",
            "BallotPosition", "Elected", "ElectedHistoric", "Incumbent",
            "Historic", "Percentage", "Swing", "QuotaProportion", "Votes")]
 
