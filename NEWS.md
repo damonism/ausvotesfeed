@@ -1,5 +1,11 @@
 # ausvotesfeed (delevelopment version)
 
+## 21 June 2022
+
+* Re-worked `download_mediafeed_api` to return the file with the original 
+  filename, and in the process implemented a bit of error checking to make sure
+  the file downloaded and was re-locaed correctly.
+
 ## 20 June 2022
 
 * Added initial TCP tab to explorer Shiny app.
