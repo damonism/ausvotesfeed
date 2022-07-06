@@ -1,10 +1,18 @@
 # ausvotesfeed (delevelopment version)
 
+# ausvotesfeed 0.1.2
+
+## 6 July 2022
+
+* Added calculation of TCP swings to `get_mediafeed_votes_type`.
+
 ## 21 June 2022
 
 * Re-worked `download_mediafeed_api` to return the file with the original 
   filename, and in the process implemented a bit of error checking to make sure
   the file downloaded and was re-locaed correctly.
+* Made a couple of improvements to the `explorer` Shiny app, including using the
+  last downloaded data and sorting the TCP page by changed seats.
 
 ## 20 June 2022
 
