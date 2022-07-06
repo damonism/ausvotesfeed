@@ -36,7 +36,11 @@ mean by "pre-poll votes". These can be found through the
 Note that for maximum extract speed the data is extracted in the tabular
 format that it appears in the media feed XML file, which is probably not
 optimal for most analysis. For best results, the resulting \code{data.frame}
-should probably be pivoted into a \code{tidyr} "long" format.
+should probably be pivoted into a \pkg{tidyr} "long" format.
+
+The media feed seems to be broken when it comes to swings for TCP votes, so
+the TCP swings are calculated by the function from the historic votes
+contained in the XML file.
 }
 \examples{
 \dontrun{

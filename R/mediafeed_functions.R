@@ -357,7 +357,11 @@ get_mediafeed_votes_pps <- function(DivisionID, xml) {
 #' Note that for maximum extract speed the data is extracted in the tabular
 #' format that it appears in the media feed XML file, which is probably not
 #' optimal for most analysis. For best results, the resulting \code{data.frame}
-#' should probably be pivoted into a \code{tidyr} "long" format.
+#' should probably be pivoted into a \pkg{tidyr} "long" format.
+#'
+#' The media feed seems to be broken when it comes to swings for TCP votes, so
+#' the TCP swings are calculated by the function from the historic votes
+#' contained in the XML file.
 #'
 #' @param xml A pointer to an XML media feed object.
 #' @param count Currently \code{fp} for first preferences or \code{tcp} for
@@ -375,6 +379,7 @@ get_mediafeed_votes_pps <- function(DivisionID, xml) {
 #' get_mediafeed_votes_type(results_xml, count = "fp")}
 #'
 #' @importFrom xml2 xml_find_all xml_attr xml_attrs xml_name xml_text
+#' @importFrom stats aggregate
 get_mediafeed_votes_type <- function(xml, count = "fp") {
   # NOTE: I think this is the most efficient strategy to get the results data
   #       and I will probably convert the other functions over to this approach
@@ -437,6 +442,22 @@ get_mediafeed_votes_type <- function(xml, count = "fp") {
   tmp_df <- tmp_df[c("CandidateID", "DivisionID", colnames(tmp_votes))]
   tmp_df[c("CandidateID", "DivisionID", "Historic", "Votes")] <- sapply(tmp_df[c("CandidateID", "DivisionID", "Historic", "Votes")], as.integer)
   tmp_df[c("Percentage", "Swing")] <- sapply(tmp_df[c("Percentage", "Swing")], as.numeric)
+
+  # TCP swings are broken in the media feeds, so we'll calculate them ourselves
+  if(tolower(count) == "tcp") {
+
+    tmp_df_sums <- aggregate(Historic ~ Type + DivisionID, sum, data = tmp_df)
+    colnames(tmp_df_sums) <- c("Type", "DivisionID", "Historic.Sum")
+    tmp_df <- merge(tmp_df, tmp_df_sums, by = c("DivisionID", "Type"), all.x = TRUE)
+    tmp_df$Historic.Percentage <- tmp_df$Historic / tmp_df$Historic.Sum * 100
+    tmp_df$Historic.Percentage <- ifelse(is.nan(tmp_df$Historic.Percentage), 0, tmp_df$Historic.Percentage)
+    tmp_df$Swing.New <- tmp_df$Percentage - tmp_df$Historic.Percentage
+
+    tmp_df[c("Swing", "Historic.Sum", "Historic.Percentage")] <- NULL
+    colnames(tmp_df) <- c("DivisionID", "Type", "CandidateID", "Historic", "Percentage", "Votes", "Swing")
+    tmp_df <- tmp_df[c("DivisionID", "Type", "CandidateID", "Historic", "Percentage", "Swing", "Votes")]
+
+  }
 
   return(tmp_df)
 }
