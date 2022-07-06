@@ -12,6 +12,11 @@ library(ggplot2)
 library(ausvotesfeed)
 load("preload_2022.rds")
 
+tmp_xml_dir <- rappdirs::user_data_dir("ausvotesfeed")
+if(!dir.exists(tmp_xml_dir)) {
+  dir.create(tmp_xml_dir)
+}
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
@@ -20,7 +25,8 @@ ui <- fluidPage(
 
     tabsetPanel(type = "tabs",
                 tabPanel("Data",
-                         actionButton("fetch", "Fetch media feed data"),
+                         p("Data current as of ", textOutput("xml_updated", inline = TRUE)),
+                         actionButton("fetch", "Update media feed data"),
                          checkboxInput("api", "Use API", value = FALSE),
                          conditionalPanel(
                            condition = "input.api == true",
@@ -28,6 +34,7 @@ ui <- fluidPage(
                          )
                 ),
                 tabPanel("TCP Leading",
+                         checkboxInput("tcp_changed", "Only show seats that have changed hands (incumbent trailing)"),
                          dataTableOutput("tcp_lead")),
                 tabPanel("By Division",
                          uiOutput("div_select"),
@@ -47,6 +54,18 @@ server <- function(input, output) {
     #### Data functions ####
 
     v <- reactiveValues(data = NULL)
+
+    # results_xml <- reactive({
+
+      tmp_files_list <- list.files(tmp_xml_dir, pattern = "aec-mediafeed-.*\\.zip", full.names = TRUE)
+      if(length(tmp_files_list) > 0){
+        tmp_filename <- rev(tmp_files_list)[1]
+        message("Using existing media feed file: ", tmp_filename)
+        read_mediafeed_xml(tmp_filename)
+        v$data <- read_mediafeed_xml(tmp_filename)
+        # v$updated <- as.POSIXct(get_mediafeed_metadata(v$data)["Created"], format = "%FT%T")
+      }
+    # })
     # v$data <- read_mediafeed_xml(download_mediafeed_file(2022, Filetype = "Verbose", Archive = FALSE))
 
     observeEvent(input$fetch, {
@@ -61,10 +80,24 @@ server <- function(input, output) {
 
       }
 
-      v$data <- read_mediafeed_xml(tmp_xml)
+      tmp_filename <- rev(strsplit(tmp_xml, "/")[[1]])[1]
+      tmp_new_xml_file <- paste0(tmp_xml_dir, "/", tmp_filename)
+      # file.copy(tmp_xml, tmp_new_xml_file)
+      if(!file.copy(tmp_xml, tmp_new_xml_file, overwrite = TRUE)) {
+        stop("Failed to copy file to ", tmp_new_xml_file)
+      }
 
-      v$updated <- as.POSIXct(get_mediafeed_metadata(v$data)["Created"], format = "%FT%T")
-      showModal(modalDialog("Results downloaded: ", v$updated))
+      v$data <- read_mediafeed_xml(tmp_new_xml_file)
+
+      results_xml <- reactive({read_mediafeed_xml(tmp_new_xml_file)})
+
+      # v$updated <- as.POSIXct(get_mediafeed_metadata(v$data)["Created"], format = "%FT%T")
+      showModal(modalDialog("Results updated."))
+    })
+
+    output$xml_updated <- renderText({
+      as.character(as.POSIXct(get_mediafeed_metadata(v$data)["Created"], format = "%FT%T"))
+      # as.character(as.POSIXct(get_mediafeed_metadata(results_xml())["Created"], format = "%FT%T"))
     })
 
     # All of the display data as a reactive object
@@ -95,7 +128,13 @@ server <- function(input, output) {
 
     output$tcp_lead <- renderDataTable({
       tmp_tcp_data <- tcp_data()
+      tmp_tcp_data$PartyCode <- ifelse(is.na(tmp_tcp_data$PartyCode), "IND", tmp_tcp_data$PartyCode)
+      tmp_tcp_data$PartyCode.Prev <- ifelse(is.na(tmp_tcp_data$PartyCode.Prev), "IND", tmp_tcp_data$PartyCode.Prev)
       tmp_tcp_data$PartyNm <- ifelse(tmp_tcp_data$IsIndependent == TRUE, "Independent", tmp_tcp_data$PartyNm)
+
+      if(input$tcp_changed) {
+        tmp_tcp_data <- tmp_tcp_data[tmp_tcp_data$PartyCode != tmp_tcp_data$PartyCode.Prev,]
+      }
       tmp_tcp_data[tmp_tcp_data$TCP.Percentage > 50,][c("DivisionNm", "StateAb", "CandidateNm", "Gender", "PartyCode.Prev", "PartyCode", "PartyNm", "TCP.Votes", "TCP.Percentage")]
     })
 
