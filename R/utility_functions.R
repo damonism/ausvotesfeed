@@ -142,8 +142,10 @@ download_mediafeed_api <- function(Server, EventIdentifier, Filetype, Archive = 
 
   tmp_zip_filename <- strsplit(tmp_zip_headers[grep("Content-Disposition: attachment", tmp_zip_headers, fixed = TRUE)], "\"")[[1]][2]
   tmp_newfile <- paste0(tempdir(), "/", tmp_zip_filename)
-  if(!file.copy(tmp_tempfile, tmp_newfile)) {
-    stop("Failed to copy from ", tmp_tempfile, " to ", tmp_newfile)
+  if(!file.exists(tmp_newfile)) {
+    if(!file.copy(tmp_tempfile, tmp_newfile)) {
+      stop("Failed to copy from ", tmp_tempfile, " to ", tmp_newfile)
+    }
   }
 
   if(file.info(tmp_newfile)$size != tmp_zip_size) {

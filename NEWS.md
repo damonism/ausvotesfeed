@@ -1,5 +1,10 @@
 # ausvotesfeed (delevelopment version)
 
+## 7 July 2022
+
+* Don't try and copy downloaded file from `download_mediafeed_api` if it already
+  exists.
+
 # ausvotesfeed 0.1.3
 
 ## 7 July 2022
