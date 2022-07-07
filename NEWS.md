@@ -1,5 +1,11 @@
 # ausvotesfeed (delevelopment version)
 
+# ausvotesfeed 0.1.3
+
+## 7 July 2022
+
+* Added totals (formal, informal, total) to `get_mediafeed_votes_type`.
+
 # ausvotesfeed 0.1.2
 
 ## 6 July 2022

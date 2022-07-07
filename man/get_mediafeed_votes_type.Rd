@@ -9,8 +9,9 @@ get_mediafeed_votes_type(xml, count = "fp")
 \arguments{
 \item{xml}{A pointer to an XML media feed object.}
 
-\item{count}{Currently \code{fp} for first preferences or \code{tcp} for
-two-candidate preferred.}
+\item{count}{Currently \code{fp} for first preferences, \code{tcp} for
+two-candidate preferred, or \code{totals} for total, formal and informal
+votes.}
 }
 \value{
 a \code{data.frame} with seven variables: \code{CandidateID},

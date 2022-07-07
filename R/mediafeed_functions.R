@@ -364,8 +364,9 @@ get_mediafeed_votes_pps <- function(DivisionID, xml) {
 #' contained in the XML file.
 #'
 #' @param xml A pointer to an XML media feed object.
-#' @param count Currently \code{fp} for first preferences or \code{tcp} for
-#'   two-candidate preferred.
+#' @param count Currently \code{fp} for first preferences, \code{tcp} for
+#'   two-candidate preferred, or \code{totals} for total, formal and informal
+#'   votes.
 #'
 #' @return a \code{data.frame} with seven variables: \code{CandidateID},
 #'   \code{DivisionID}, \code{Type} (\code{Ordinary}, \code{Absent},
@@ -410,19 +411,45 @@ get_mediafeed_votes_type <- function(xml, count = "fp") {
                       sep = "|")
 
   } else if(tolower(count) == "tpp") {
+
     stop("TPP is currently not implemented")
+
     tmp_path <- paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier",
                       "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoPartyPreferred/d1:Coalition/d1:CoalitionIdentifier",
                       "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:TwoPartyPreferred/d1:Coalition/d1:CoalitionIdentifier/d1:VotesByType/d1:Votes",
                       sep = "|")
 
+  } else if(tolower(count) == "totals") {
+
+    tmp_path <- paste("d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:PollingDistrictIdentifier",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Formal",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Formal/d1:VotesByType/d1:Votes",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Informal",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Informal/d1:VotesByType/d1:Votes",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Total",
+                      "d1:Results/d1:Election/d1:House/d1:Contests/d1:Contest/d1:FirstPreferences/d1:Total/d1:VotesByType/d1:Votes",
+                      sep = "|")
+
   } else {
-    stop("count must be one of 'fp', 'tcp' or 'tpp'.")
+    stop("count must be one of 'fp', 'tcp', 'tpp' or 'totals'.")
   }
 
   tmp_votes_nodes <- xml_find_all(xml, tmp_path)
 
-  tmp_votes <- data.frame(as.data.frame(do.call("rbind", xml_attrs(tmp_votes_nodes))),
+  if(tolower(count) == "totals") {
+
+    tmp_type_votes <- data.frame(Type = xml_attr(tmp_votes_nodes, "Type"),
+                                 Historic = xml_attr(tmp_votes_nodes, "Historic"),
+                                 Percentage = xml_attr(tmp_votes_nodes, "Percentage"),
+                                 Swing = xml_attr(tmp_votes_nodes, "Swing"),
+                                 stringsAsFactors = FALSE)
+  } else {
+
+    tmp_type_votes <- as.data.frame(do.call("rbind", xml_attrs(tmp_votes_nodes)))
+
+  }
+
+  tmp_votes <- data.frame(tmp_type_votes,
                           Votes = xml_text(tmp_votes_nodes),
                           stringsAsFactors = FALSE)
 
@@ -434,13 +461,24 @@ get_mediafeed_votes_type <- function(xml, count = "fp") {
   tmp_df$DivisionID <- ifelse(tmp_df$Name == "PollingDistrictIdentifier", tmp_df$Id, NA)
   tmp_df$DivisionID <- Fill(tmp_df$DivisionID)
   tmp_df <- tmp_df[tmp_df$Name != "PollingDistrictIdentifier",]
+
   # CandidateID needs to be done after DivisionID
-  tmp_df$CandidateID <- ifelse(tmp_df$Name == "CandidateIdentifier", tmp_df$Id, NA)
+  if(tolower(count) == "totals") {
+    tmp_df$CandidateID <- ifelse(tmp_df$Name %in% c("Formal", "Informal", "Total"), tmp_df$Name, NA)
+  } else {
+    tmp_df$CandidateID <- ifelse(tmp_df$Name == "CandidateIdentifier", tmp_df$Id, NA)
+  }
   tmp_df$CandidateID <- Fill(tmp_df$CandidateID)
-  tmp_df <- tmp_df[tmp_df$Name != "CandidateIdentifier",]
+  tmp_df <- tmp_df[!tmp_df$Name %in% c("CandidateIdentifier", "Formal", "Informal", "Total"),]
 
   tmp_df <- tmp_df[c("CandidateID", "DivisionID", colnames(tmp_votes))]
-  tmp_df[c("CandidateID", "DivisionID", "Historic", "Votes")] <- sapply(tmp_df[c("CandidateID", "DivisionID", "Historic", "Votes")], as.integer)
+
+  tmp_list_int <- c("DivisionID", "Historic", "Votes")
+  if(tolower(count) != "totals") {
+    tmp_list_int <- c("CandidateID", tmp_list_int)
+  }
+  tmp_df[tmp_list_int] <- sapply(tmp_df[tmp_list_int], as.integer)
+
   tmp_df[c("Percentage", "Swing")] <- sapply(tmp_df[c("Percentage", "Swing")], as.numeric)
 
   # TCP swings are broken in the media feeds, so we'll calculate them ourselves
