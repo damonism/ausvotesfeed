@@ -256,3 +256,27 @@ get_mediafeed_votes_div(results_xml, "tcp") %>%
   arrange(TCP.Margin)
 ```
 
+## Two-party preferred by state (and nationally)
+
+This is particularly handy because the AEC does not include national TPP
+swings in the CSV files in the VTR.
+
+```{r tpp_swings}
+get_mediafeed_votes_div(results_xml, "tpp") |> 
+  left_join(mf_div, by = c("DivisionID")) |> 
+  group_by(StateAb, CoalitionCode) |> 
+  summarise(Historic = sum(TPP.Historic),
+            Votes = sum(TPP.Votes), .groups = "drop_last") |> 
+  mutate(HistoricPercent = Historic / sum(Historic) * 100,
+         Percent = Votes / sum(Votes) * 100,
+         Swing = Percent - HistoricPercent) %>% 
+  bind_rows(group_by(., CoalitionCode) |> 
+              summarise(Historic = sum(Historic), Votes = sum(Votes), .groups = "drop_last") |> 
+              mutate(HistoricPercent = Historic / sum(Historic) * 100,
+                     Percent = Votes / sum(Votes) * 100,
+                     Swing = Percent - HistoricPercent,
+                     StateAb = "National")) |> 
+  select(StateAb, CoalitionCode, Percent, Swing) |> 
+  pivot_wider(names_from = CoalitionCode, values_from = c(Percent, Swing))
+```
+
